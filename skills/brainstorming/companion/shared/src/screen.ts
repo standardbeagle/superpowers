@@ -41,7 +41,7 @@ export const InputDef = z.discriminatedUnion("type", [
 ]);
 export type InputDef = z.infer<typeof InputDef>;
 
-const QuestionScreen = z.object({
+export const QuestionScreen = z.object({
   kind: z.literal("question"),
   id: z.string().min(1),
   title: z.string().min(1),
@@ -49,7 +49,7 @@ const QuestionScreen = z.object({
   inputs: z.array(InputDef).min(1),
 });
 
-const DemoScreen = z.object({
+export const DemoScreen = z.object({
   kind: z.literal("demo"),
   id: z.string().min(1),
   title: z.string().min(1),
@@ -69,13 +69,13 @@ const DemoScreen = z.object({
   })).min(1),
 });
 
-const DecisionOption = z.object({
+export const DecisionOption = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
   recommended: z.boolean().default(false),
 });
 
-const DecisionScreen = z.object({
+export const DecisionScreen = z.object({
   kind: z.literal("decision"),
   id: z.string().min(1),
   title: z.string().min(1),
