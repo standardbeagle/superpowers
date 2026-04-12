@@ -2,7 +2,8 @@
   "name": "@companion/root",
   "private": true,
   "workspaces": [
-    "shared"
+    "shared",
+    "packages/server"
   ],
   "scripts": {
     "build": "bun run --cwd packages/web build",

@@ -1,0 +1,20 @@
+{
+  "name": "@companion/server",
+  "version": "0.0.0",
+  "type": "module",
+  "bin": { "companion": "src/cli.ts" },
+  "scripts": {
+    "dev": "bun run src/cli.ts start",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@companion/shared": "workspace:*",
+    "chokidar": "^3.6.0",
+    "gray-matter": "^4.0.3",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "bun-types": "^1.1.0"
+  }
+}
