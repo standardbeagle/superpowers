@@ -9,7 +9,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "esModuleInterop": true,
-    "types": ["bun-types"]
+    "esModuleInterop": true
   }
 }
