@@ -1,3 +1,69 @@
-// Stub — real implementation lands in Task 6.
-export async function runStart(_opts: unknown): Promise<unknown> { throw new Error("runStart not implemented"); }
-export async function runStop (_opts: unknown): Promise<void>    { throw new Error("runStop not implemented"); }
+import { ensureSessionDir, writeServerInfo, clearServerInfo } from "./session";
+import type { Server } from "bun";
+
+export interface CliOptions {
+  command: "start" | "stop";
+  sessionDir: string;
+  docRoots: string[];
+  host: string;
+  port: number | undefined;
+  urlHost: string | undefined;
+  foreground: boolean;
+  emitNavigate: boolean;
+}
+
+export interface RunningServer {
+  url: string;
+  port: number;
+  server: Server;
+  sessionDir: string;
+  shutdown: () => Promise<void>;
+}
+
+export async function runStart(opts: CliOptions): Promise<RunningServer> {
+  ensureSessionDir(opts.sessionDir);
+
+  const server = Bun.serve({
+    hostname: opts.host,
+    port: opts.port ?? 0,
+    fetch(req) {
+      const url = new URL(req.url);
+      if (url.pathname === "/api/health") {
+        return Response.json({ ok: true });
+      }
+      return new Response("not found", { status: 404 });
+    },
+  });
+
+  const urlHost = opts.urlHost ?? opts.host;
+  const url = `http://${urlHost}:${server.port}`;
+  const info = { url, port: server.port, pid: process.pid, session_dir: opts.sessionDir };
+  writeServerInfo(opts.sessionDir, info);
+  process.stdout.write(JSON.stringify({ type: "server_ready", ...info }) + "\n");
+
+  const shutdown = async () => {
+    clearServerInfo(opts.sessionDir, "stopped");
+    server.stop(true);
+  };
+
+  process.on("SIGTERM", () => { void shutdown().then(() => process.exit(0)); });
+  process.on("SIGINT",  () => { void shutdown().then(() => process.exit(0)); });
+
+  return { url, port: server.port, server, sessionDir: opts.sessionDir, shutdown };
+}
+
+export async function stopRunning(ctl: RunningServer): Promise<void> {
+  await ctl.shutdown();
+}
+
+export async function runStop(opts: CliOptions): Promise<void> {
+  const { readFileSync, existsSync } = await import("fs");
+  const { join } = await import("path");
+  const info = join(opts.sessionDir, "server-info");
+  if (!existsSync(info)) {
+    console.error("no running server at", opts.sessionDir);
+    return;
+  }
+  const { pid } = JSON.parse(readFileSync(info, "utf8"));
+  process.kill(pid, "SIGTERM");
+}
