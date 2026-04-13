@@ -1,4 +1,6 @@
 import { ensureSessionDir, writeServerInfo, clearServerInfo } from "./session";
+import { createScreensRepo } from "./screens-repo";
+import { handle } from "./routes";
 import type { Server } from "bun";
 
 export interface CliOptions {
@@ -23,16 +25,13 @@ export interface RunningServer {
 export async function runStart(opts: CliOptions): Promise<RunningServer> {
   ensureSessionDir(opts.sessionDir);
 
+  const screens = await createScreensRepo(opts.sessionDir);
+  const ctx = { screens };
+
   const server = Bun.serve({
     hostname: opts.host,
     port: opts.port ?? 0,
-    fetch(req) {
-      const url = new URL(req.url);
-      if (url.pathname === "/api/health") {
-        return Response.json({ ok: true });
-      }
-      return new Response("not found", { status: 404 });
-    },
+    fetch(req) { return handle(req, ctx); },
   });
 
   const urlHost = opts.urlHost ?? opts.host;
@@ -42,6 +41,7 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   process.stdout.write(JSON.stringify({ type: "server_ready", ...info }) + "\n");
 
   const shutdown = async () => {
+    await screens.close();
     clearServerInfo(opts.sessionDir, "stopped");
     server.stop(true);
   };
