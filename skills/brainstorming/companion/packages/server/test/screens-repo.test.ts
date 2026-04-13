@@ -37,8 +37,11 @@ test("fires change events when a screen is added", async () => {
   try {
     writeFileSync(join(dir, "screens", "new.md"),
       `---\nkind: question\nid: new\ntitle: New?\ninputs:\n  - {type: text, name: n}\n---\n`);
-    // chokidar flush delay varies by filesystem; WSL2 under parallel test load needs extra time
-    await new Promise(r => setTimeout(r, 3000));
+    // Poll for chokidar to fire; WSL2 polling watcher under suite load is variable
+    const deadline = Date.now() + 5000;
+    while (Date.now() < deadline && !events.includes("add:new")) {
+      await new Promise(r => setTimeout(r, 50));
+    }
     expect(events).toContain("add:new");
   } finally { await repo.close(); }
 });
