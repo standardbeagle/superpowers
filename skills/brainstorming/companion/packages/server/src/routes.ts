@@ -1,7 +1,9 @@
 import type { ScreensRepo } from "./screens-repo";
+import type { SseHub } from "./sse";
 
 export interface RouteCtx {
   screens: ScreensRepo;
+  sse: SseHub;
 }
 
 export function handle(req: Request, ctx: RouteCtx): Response | Promise<Response> {
@@ -22,6 +24,9 @@ export function handle(req: Request, ctx: RouteCtx): Response | Promise<Response
     const s = ctx.screens.get(id);
     if (!s) return new Response("not found", { status: 404 });
     return Response.json({ frontmatter: s.frontmatter, body: s.body });
+  }
+  if (req.method === "GET" && url.pathname === "/api/stream") {
+    return ctx.sse.handle(req);
   }
   return new Response("not found", { status: 404 });
 }

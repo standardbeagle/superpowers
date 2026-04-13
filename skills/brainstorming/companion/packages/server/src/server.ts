@@ -1,5 +1,6 @@
 import { ensureSessionDir, writeServerInfo, clearServerInfo } from "./session";
 import { createScreensRepo } from "./screens-repo";
+import { createSseHub } from "./sse";
 import { handle } from "./routes";
 import type { Server } from "bun";
 
@@ -26,7 +27,11 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   ensureSessionDir(opts.sessionDir);
 
   const screens = await createScreensRepo(opts.sessionDir);
-  const ctx = { screens };
+  const sse = createSseHub();
+  const ctx = { screens, sse };
+  screens.onChange((kind, id) => {
+    sse.push("refresh", { kind: "screen", id, action: kind });
+  });
 
   const server = Bun.serve({
     hostname: opts.host,
@@ -41,6 +46,7 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   process.stdout.write(JSON.stringify({ type: "server_ready", ...info }) + "\n");
 
   const shutdown = async () => {
+    sse.close();
     await screens.close();
     clearServerInfo(opts.sessionDir, "stopped");
     server.stop(true);
