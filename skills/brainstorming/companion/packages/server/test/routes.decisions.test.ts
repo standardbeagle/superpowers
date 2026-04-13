@@ -81,6 +81,20 @@ test("POST /api/decisions/:id does not log a duplicate event when nothing change
   });
 });
 
+test("POST /api/decisions/:id dedupes when body omits note (keep-existing semantic)", async () => {
+  await withServer(async (url, dir) => {
+    writeFileSync(join(dir, "decisions", "d1.md"),
+      `---\nkind: decision\nid: d1\ntitle: T\nstatus: proposed\noptions:\n  - {id: a, label: A}\n  - {id: b, label: B}\n---\n`);
+    // first submission writes status+chosen+note
+    await fetch(`${url}/api/decisions/d1`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: "approved", chosen_option: "a", note: "first pass" }) });
+    // second submission re-sends status+chosen but no note — should be deduped
+    const res = await fetch(`${url}/api/decisions/d1`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: "approved", chosen_option: "a" }) });
+    expect((await res.json()).duplicate).toBe(true);
+    const lines = readFileSync(join(dir, "events.jsonl"), "utf8").trim().split("\n").filter(Boolean).map(l => JSON.parse(l));
+    expect(lines.filter(e => e.type === "decision" && e.id === "d1")).toHaveLength(1);
+  });
+});
+
 test("POST /api/decisions/:id still logs when note changes between identical status/chosen", async () => {
   await withServer(async (url, dir) => {
     writeFileSync(join(dir, "decisions", "d1.md"),

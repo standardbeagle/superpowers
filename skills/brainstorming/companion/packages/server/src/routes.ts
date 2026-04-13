@@ -194,12 +194,13 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     if (!body?.status) return new Response("bad request", { status: 400 });
 
     // Dedupe: if the file already matches the incoming tuple exactly, do not
-    // rewrite and do not append a duplicate event. Accidental double-clicks
-    // used to log two identical `decision` events in events.jsonl.
+    // rewrite and do not append a duplicate event. An undefined field on the
+    // request body means "keep existing" (the updateStatus path skips undefined
+    // too), so from a dedupe perspective that dimension always matches.
     const current = ctx.decisions.list().find(d => d.id === id);
     const sameStatus = current?.status === body.status;
-    const sameChosen = (current?.chosen_option ?? undefined) === (body.chosen_option ?? undefined);
-    const sameNote   = (current?.note          ?? undefined) === (body.note          ?? undefined);
+    const sameChosen = body.chosen_option === undefined || current?.chosen_option === body.chosen_option;
+    const sameNote   = body.note          === undefined || current?.note          === body.note;
     if (current && sameStatus && sameChosen && sameNote) {
       return Response.json({ ok: true, duplicate: true });
     }
