@@ -4,8 +4,21 @@ import type { EventsWriter } from "./events-writer";
 import type { IdempotencyStore } from "./idempotency";
 import type { DecisionsRepo } from "./decisions-repo";
 import { assertDeclaredPath, savePrivate } from "./privacy";
-import { readdirSync, statSync, readFileSync } from "fs";
-import { join, relative } from "path";
+import { existsSync, readdirSync, statSync, readFileSync } from "fs";
+import { join, relative, resolve } from "path";
+
+const WEB_DIST = resolve(import.meta.dir, "..", "..", "web", "dist");
+
+function serveStatic(url: URL): Response | undefined {
+  let rel = url.pathname === "/" ? "/index.html" : url.pathname;
+  // SPA fallback: any non-api path with no extension falls through to index.html
+  if (!rel.startsWith("/api") && !/\.[a-z0-9]+$/i.test(rel)) rel = "/index.html";
+  const p = join(WEB_DIST, rel);
+  if (!p.startsWith(WEB_DIST) || !existsSync(p)) return undefined;
+  const ext = p.slice(p.lastIndexOf(".") + 1);
+  const ct = ({ html:"text/html", js:"text/javascript", css:"text/css", svg:"image/svg+xml", map:"application/json" } as Record<string,string>)[ext] ?? "application/octet-stream";
+  return new Response(readFileSync(p), { headers: { "content-type": ct } });
+}
 
 export interface RouteCtx {
   screens: ScreensRepo;
@@ -146,5 +159,7 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     }
     return new Response(readFileSync(p, "utf8"), { headers: { "content-type": "text/markdown" } });
   }
+  const asset = serveStatic(url);
+  if (asset) return asset;
   return new Response("not found", { status: 404 });
 }
