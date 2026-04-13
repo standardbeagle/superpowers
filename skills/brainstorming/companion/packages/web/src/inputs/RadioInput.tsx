@@ -4,8 +4,9 @@ export function RadioInput({ def, value, onChange }: { def: any; value: unknown;
     <fieldset>
       <legend>{def.label ?? def.name}</legend>
       {options.map((o: any) => (
-        <label key={o.value} style={{ display: "block", fontWeight: 400 }}>
-          <input type="radio" name={def.name} value={o.value} checked={value === o.value} onChange={() => onChange(o.value)} /> {o.label}
+        <label key={o.value} class="option">
+          <input type="radio" name={def.name} value={o.value} checked={value === o.value} onChange={() => onChange(o.value)} />
+          <span>{o.label}</span>
         </label>
       ))}
     </fieldset>

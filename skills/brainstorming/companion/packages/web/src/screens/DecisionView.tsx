@@ -38,8 +38,9 @@ export function DecisionView({ params }: { params: { id: string } }) {
       <fieldset style={{ marginTop: 16 }}>
         <legend>Options</legend>
         {fm.options.map((o: any) => (
-          <label key={o.id} style={{ display: "block", fontWeight: 400 }}>
-            <input type="radio" name="opt" value={o.id} checked={chosen === o.id} onChange={() => setChosen(o.id)} /> {o.label}{o.recommended ? " ⭐" : ""}
+          <label key={o.id} class="option">
+            <input type="radio" name="opt" value={o.id} checked={chosen === o.id} onChange={() => setChosen(o.id)} />
+            <span>{o.label}{o.recommended ? " ⭐" : ""}</span>
           </label>
         ))}
       </fieldset>

@@ -8,8 +8,9 @@ export function MultiInput({ def, value, onChange }: { def: any; value: unknown;
     <fieldset>
       <legend>{def.label ?? def.name}</legend>
       {options.map((o: any) => (
-        <label key={o.value} style={{ display: "block", fontWeight: 400 }}>
-          <input type="checkbox" checked={arr.includes(o.value)} onChange={() => toggle(o.value)} /> {o.label}
+        <label key={o.value} class="option">
+          <input type="checkbox" checked={arr.includes(o.value)} onChange={() => toggle(o.value)} />
+          <span>{o.label}</span>
         </label>
       ))}
     </fieldset>
