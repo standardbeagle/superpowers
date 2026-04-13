@@ -5,9 +5,12 @@ import type { IdempotencyStore } from "./idempotency";
 import type { DecisionsRepo } from "./decisions-repo";
 import { assertDeclaredPath, savePrivate } from "./privacy";
 import { existsSync, readdirSync, statSync, readFileSync } from "fs";
-import { join, relative, resolve } from "path";
+import { join, relative, resolve, dirname } from "path";
 
 const WEB_DIST = resolve(import.meta.dir, "..", "..", "web", "dist");
+
+const demoWindow: Array<{ ts: number; screen: string }> = [];
+let dropped = 0;
 
 function serveStatic(url: URL): Response | undefined {
   let rel = url.pathname === "/" ? "/index.html" : url.pathname;
@@ -159,6 +162,39 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     }
     return new Response(readFileSync(p, "utf8"), { headers: { "content-type": "text/markdown" } });
   }
+
+  if (req.method === "GET" && url.pathname === "/api/demo-asset") {
+    const sid = url.searchParams.get("screen_id");
+    const file = url.searchParams.get("file");
+    if (!sid || !file) return new Response("bad request", { status: 400 });
+    const s = ctx.screens.get(sid);
+    if (!s || s.frontmatter.kind !== "demo") return new Response("not found", { status: 404 });
+    const base = dirname(s.path);
+    const target = resolve(base, file);
+    if (relative(base, target).startsWith("..")) return new Response("forbidden", { status: 403 });
+    if (!existsSync(target)) return new Response("not found", { status: 404 });
+    return new Response(readFileSync(target, "utf8"));
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/demo-event") {
+    const body = await req.json().catch(() => null) as { screen_id?: string; name?: string; data?: unknown } | null;
+    if (!body?.screen_id || !body.name) return new Response("bad request", { status: 400 });
+    const now = Date.now();
+    demoWindow.push({ ts: now, screen: body.screen_id });
+    while (demoWindow.length && now - demoWindow[0]!.ts > 1000) demoWindow.shift();
+    const inWindow = demoWindow.filter(e => e.screen === body.screen_id).length;
+    if (inWindow > 10) {
+      dropped++;
+      return Response.json({ ok: true, throttled: true });
+    }
+    if (dropped > 0) {
+      await ctx.events.append({ type: "demo_event_throttled", screen_id: body.screen_id, dropped });
+      dropped = 0;
+    }
+    await ctx.events.append({ type: "demo_event", screen_id: body.screen_id, name: body.name, data: body.data });
+    return Response.json({ ok: true });
+  }
+
   const asset = serveStatic(url);
   if (asset) return asset;
   return new Response("not found", { status: 404 });

@@ -1,6 +1,7 @@
 import { LocationProvider, Router, Route } from "preact-iso";
 import { Shell } from "./layout/Shell";
 import { ScreenView } from "./screens/ScreenView";
+import { DemoView } from "./screens/DemoView";
 
 export function App() {
   return (
@@ -9,6 +10,7 @@ export function App() {
         <Router>
           <Route path="/" component={Home} />
           <Route path="/screen/:id" component={ScreenView} />
+          <Route path="/demo/:id" component={DemoView} />
           <Route default component={NotFound} />
         </Router>
       </Shell>

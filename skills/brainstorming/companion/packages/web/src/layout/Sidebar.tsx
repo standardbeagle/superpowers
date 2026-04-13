@@ -20,7 +20,12 @@ export function Sidebar() {
     <nav class="sidebar-nav">
       <Section title="Screens">
         {screens.map(s => (
-          <a key={s.id} href={`/screen/${s.id}`} class="sidebar-item" data-kind={s.kind}>
+          <a
+            key={s.id}
+            href={s.kind === "demo" ? `/demo/${s.id}` : s.kind === "decision" ? `/decisions/${s.id}` : `/screen/${s.id}`}
+            class="sidebar-item"
+            data-kind={s.kind}
+          >
             <span class="dot" /> {s.title}
           </a>
         ))}
