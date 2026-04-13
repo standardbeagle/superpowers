@@ -4,7 +4,7 @@ import { createSseHub } from "./sse";
 import { createEventsWriter } from "./events-writer";
 import { createIdempotencyStore } from "./idempotency";
 import { createDecisionsRepo } from "./decisions-repo";
-import { handle } from "./routes";
+import { handle, flushAllDemo } from "./routes";
 import type { Server } from "bun";
 
 export interface CliOptions {
@@ -52,6 +52,7 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   process.stdout.write(JSON.stringify({ type: "server_ready", ...info }) + "\n");
 
   const shutdown = async () => {
+    await flushAllDemo(ctx);
     sse.close();
     await screens.close();
     clearServerInfo(opts.sessionDir, "stopped");

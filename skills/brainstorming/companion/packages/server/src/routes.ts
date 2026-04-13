@@ -13,6 +13,58 @@ const HELP_MD = resolve(import.meta.dir, "..", "..", "..", "docs", "screen-forma
 const demoWindow: Array<{ ts: number; screen: string }> = [];
 let dropped = 0;
 
+// Merged debounce buffer for demo events. Same (screen_id, name) events within
+// 250ms coalesce; a different key flushes the prior one first in arrival order.
+interface PendingDemoEvent {
+  screen_id: string;
+  name: string;
+  data: unknown;
+  count: number;
+  timer: ReturnType<typeof setTimeout>;
+}
+const pendingDemo = new Map<string, PendingDemoEvent>();  // key = `${screen_id}::${name}`
+const DEBOUNCE_MS = 250;
+
+async function flushDemo(key: string, ctx: RouteCtx): Promise<void> {
+  const p = pendingDemo.get(key);
+  if (!p) return;
+  clearTimeout(p.timer);
+  pendingDemo.delete(key);
+  // Rate-limit safety net (unchanged semantics)
+  const now = Date.now();
+  demoWindow.push({ ts: now, screen: p.screen_id });
+  while (demoWindow.length && now - demoWindow[0]!.ts > 1000) demoWindow.shift();
+  const inWindow = demoWindow.filter(e => e.screen === p.screen_id).length;
+  if (inWindow > 10) {
+    dropped++;
+    return;
+  }
+  if (dropped > 0) {
+    await ctx.events.append({ type: "demo_event_throttled", screen_id: p.screen_id, dropped });
+    dropped = 0;
+  }
+  const payload: Record<string, unknown> = {
+    type: "demo_event",
+    screen_id: p.screen_id,
+    name: p.name,
+    data: p.data,
+  };
+  if (p.count > 1) payload.merged = p.count;
+  await ctx.events.append(payload);
+}
+
+async function flushAllDemoExcept(key: string, ctx: RouteCtx): Promise<void> {
+  // Flush any other pending events in insertion order so arrival ordering is preserved
+  for (const k of Array.from(pendingDemo.keys())) {
+    if (k === key) continue;
+    await flushDemo(k, ctx);
+  }
+}
+
+export async function flushAllDemo(ctx: RouteCtx): Promise<void> {
+  for (const k of Array.from(pendingDemo.keys())) await flushDemo(k, ctx);
+}
+
 function serveStatic(url: URL): Response | undefined {
   let rel = url.pathname === "/" ? "/index.html" : url.pathname;
   // SPA fallback: any non-api path with no extension falls through to index.html
@@ -132,6 +184,12 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
   if (req.method === "GET" && url.pathname === "/api/decisions") {
     return Response.json(ctx.decisions.list());
   }
+  if (req.method === "GET" && url.pathname.startsWith("/api/decisions/")) {
+    const id = url.pathname.slice("/api/decisions/".length);
+    const d = ctx.decisions.getById(id);
+    if (!d) return new Response("not found", { status: 404 });
+    return Response.json(d);
+  }
   if (req.method === "POST" && url.pathname.startsWith("/api/decisions/")) {
     const id = url.pathname.slice("/api/decisions/".length);
     const body = await req.json().catch(() => null) as {
@@ -185,20 +243,28 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
   if (req.method === "POST" && url.pathname === "/api/demo-event") {
     const body = await req.json().catch(() => null) as { screen_id?: string; name?: string; data?: unknown } | null;
     if (!body?.screen_id || !body.name) return new Response("bad request", { status: 400 });
-    const now = Date.now();
-    demoWindow.push({ ts: now, screen: body.screen_id });
-    while (demoWindow.length && now - demoWindow[0]!.ts > 1000) demoWindow.shift();
-    const inWindow = demoWindow.filter(e => e.screen === body.screen_id).length;
-    if (inWindow > 10) {
-      dropped++;
-      return Response.json({ ok: true, throttled: true });
+    const key = `${body.screen_id}::${body.name}`;
+
+    // Any different (screen_id, name) that has pending work flushes first
+    await flushAllDemoExcept(key, ctx);
+
+    const existing = pendingDemo.get(key);
+    if (existing) {
+      clearTimeout(existing.timer);
+      existing.data = body.data;
+      existing.count += 1;
+      existing.timer = setTimeout(() => { void flushDemo(key, ctx); }, DEBOUNCE_MS);
+    } else {
+      const p: PendingDemoEvent = {
+        screen_id: body.screen_id,
+        name: body.name,
+        data: body.data,
+        count: 1,
+        timer: setTimeout(() => { void flushDemo(key, ctx); }, DEBOUNCE_MS),
+      };
+      pendingDemo.set(key, p);
     }
-    if (dropped > 0) {
-      await ctx.events.append({ type: "demo_event_throttled", screen_id: body.screen_id, dropped });
-      dropped = 0;
-    }
-    await ctx.events.append({ type: "demo_event", screen_id: body.screen_id, name: body.name, data: body.data });
-    return Response.json({ ok: true });
+    return Response.json({ ok: true, pending: true });
   }
 
   const asset = serveStatic(url);
