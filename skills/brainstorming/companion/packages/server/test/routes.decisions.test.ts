@@ -62,3 +62,38 @@ test("POST /api/decisions/:id updates status and appends event", async () => {
     expect(ev.status).toBe("approved");
   });
 });
+
+test("POST /api/decisions/:id does not log a duplicate event when nothing changed", async () => {
+  await withServer(async (url, dir) => {
+    writeFileSync(join(dir, "decisions", "d1.md"),
+      `---\nkind: decision\nid: d1\ntitle: T\nstatus: proposed\noptions:\n  - {id: a, label: A}\n  - {id: b, label: B}\n---\n`);
+
+    const body = JSON.stringify({ status: "approved", chosen_option: "a", note: "because" });
+    const first  = await fetch(`${url}/api/decisions/d1`, { method: "POST", headers: { "content-type": "application/json" }, body });
+    const second = await fetch(`${url}/api/decisions/d1`, { method: "POST", headers: { "content-type": "application/json" }, body });
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(200);
+    expect((await second.json()).duplicate).toBe(true);
+
+    const lines = readFileSync(join(dir, "events.jsonl"), "utf8").trim().split("\n").filter(Boolean).map(l => JSON.parse(l));
+    const decisionEvents = lines.filter(e => e.type === "decision" && e.id === "d1");
+    expect(decisionEvents).toHaveLength(1);
+  });
+});
+
+test("POST /api/decisions/:id still logs when note changes between identical status/chosen", async () => {
+  await withServer(async (url, dir) => {
+    writeFileSync(join(dir, "decisions", "d1.md"),
+      `---\nkind: decision\nid: d1\ntitle: T\nstatus: proposed\noptions:\n  - {id: a, label: A}\n  - {id: b, label: B}\n---\n`);
+
+    const base = { status: "approved", chosen_option: "a" };
+    await fetch(`${url}/api/decisions/d1`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...base, note: "first" }) });
+    await fetch(`${url}/api/decisions/d1`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...base, note: "second" }) });
+
+    const lines = readFileSync(join(dir, "events.jsonl"), "utf8").trim().split("\n").filter(Boolean).map(l => JSON.parse(l));
+    const decisionEvents = lines.filter(e => e.type === "decision" && e.id === "d1");
+    expect(decisionEvents).toHaveLength(2);
+    expect(decisionEvents[0].note).toBe("first");
+    expect(decisionEvents[1].note).toBe("second");
+  });
+});

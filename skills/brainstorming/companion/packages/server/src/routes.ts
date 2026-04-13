@@ -192,6 +192,18 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
       status?: "approved"|"revised"|"rejected"|"proposed"; chosen_option?: string; note?: string;
     } | null;
     if (!body?.status) return new Response("bad request", { status: 400 });
+
+    // Dedupe: if the file already matches the incoming tuple exactly, do not
+    // rewrite and do not append a duplicate event. Accidental double-clicks
+    // used to log two identical `decision` events in events.jsonl.
+    const current = ctx.decisions.list().find(d => d.id === id);
+    const sameStatus = current?.status === body.status;
+    const sameChosen = (current?.chosen_option ?? undefined) === (body.chosen_option ?? undefined);
+    const sameNote   = (current?.note          ?? undefined) === (body.note          ?? undefined);
+    if (current && sameStatus && sameChosen && sameNote) {
+      return Response.json({ ok: true, duplicate: true });
+    }
+
     try {
       ctx.decisions.updateStatus(id, body.status, body.chosen_option, body.note);
     } catch (err) {
