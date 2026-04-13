@@ -15,9 +15,15 @@ export function DemoView({ params }: { params: { id: string } }) {
     if (!screen || screen.frontmatter.kind !== "demo") return;
     const { demo } = screen.frontmatter;
     (async () => {
-      const htmlBody = demo.inlineHtml ?? await (await fetch(`/api/demo-asset?screen_id=${params.id}&file=${encodeURIComponent(demo.html)}`)).text();
-      const css = demo.css ? await (await fetch(`/api/demo-asset?screen_id=${params.id}&file=${encodeURIComponent(demo.css)}`)).text() : "";
-      const js  = demo.js  ? await (await fetch(`/api/demo-asset?screen_id=${params.id}&file=${encodeURIComponent(demo.js)}`)).text()  : "";
+      const fetchAsset = async (file: string) =>
+        (await fetch(`/api/demo-asset?screen_id=${params.id}&file=${encodeURIComponent(file)}`)).text();
+
+      const htmlBody =
+        demo.inlineHtml ?? (demo.html ? await fetchAsset(demo.html) : "");
+      const css =
+        demo.inlineCss  ?? (demo.css  ? await fetchAsset(demo.css)  : "");
+      const js =
+        demo.inlineJs   ?? (demo.js   ? await fetchAsset(demo.js)   : "");
       const bridge = `
         <script>
           window.__emit = (name, data) =>

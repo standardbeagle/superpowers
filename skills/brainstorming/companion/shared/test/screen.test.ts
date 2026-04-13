@@ -46,6 +46,22 @@ test("demo screen requires an html source", () => {
   ).toThrow();
 });
 
+test("demo screen with inline html/css/js parses", () => {
+  const parsed = ScreenFrontmatter.parse({
+    kind: "demo",
+    id: "inline",
+    title: "Inline demo",
+    demo: {
+      type: "srcdoc",
+      inlineHtml: "<button id=b>Click</button>",
+      inlineCss:  "#b { color: red; }",
+      inlineJs:   "document.getElementById('b').onclick = () => window.__emit('clicked');",
+    },
+    actions: [{ type: "approve", label: "Ship it" }],
+  });
+  expect(parsed.kind).toBe("demo");
+});
+
 test("decision screen with options parses", () => {
   const parsed = ScreenFrontmatter.parse({
     kind: "decision",

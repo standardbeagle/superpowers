@@ -60,6 +60,8 @@ export const DemoScreen = z.object({
     css: z.string().optional(),
     js: z.string().optional(),
     inlineHtml: z.string().optional(),
+    inlineCss: z.string().optional(),
+    inlineJs: z.string().optional(),
     viewport: z.object({ width: z.number().int().positive(), height: z.number().int().positive() }).default({ width: 480, height: 720 }),
   }).refine(d => d.html || d.inlineHtml, { message: "demo requires html path or inlineHtml" }),
   actions: z.array(z.object({
