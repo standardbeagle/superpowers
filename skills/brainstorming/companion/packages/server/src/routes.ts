@@ -82,6 +82,7 @@ export interface RouteCtx {
   idempotency: IdempotencyStore;
   decisions: DecisionsRepo;
   docRoots: string[];
+  shutdown?: (reason: string) => Promise<void>;
 }
 
 function listMarkdown(root: string): string[] {
@@ -244,6 +245,16 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     return new Response(readFileSync(target, "utf8"));
   }
 
+  if (req.method === "POST" && url.pathname === "/api/shutdown") {
+    const body = await req.json().catch(() => null) as { reason?: string } | null;
+    const reason = body?.reason ?? "llm requested shutdown";
+    if (ctx.shutdown) {
+      // Kick off shutdown after this response flushes so the POST returns cleanly.
+      const fn = ctx.shutdown;
+      setTimeout(() => { void fn(reason); }, 10);
+    }
+    return Response.json({ ok: true, reason });
+  }
   if (req.method === "GET" && url.pathname === "/api/help") {
     if (!existsSync(HELP_MD)) return new Response("help file not found", { status: 404 });
     return new Response(readFileSync(HELP_MD, "utf8"), { headers: { "content-type": "text/markdown" } });

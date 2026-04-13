@@ -5,8 +5,12 @@ import { DemoView } from "./screens/DemoView";
 import { DecisionView } from "./screens/DecisionView";
 import { DocsView } from "./screens/DocsView";
 import { HelpView } from "./screens/HelpView";
+import { EndedView } from "./screens/EndedView";
+import { useShutdownState } from "./lib/sse";
 
 export function App() {
+  const { phase } = useShutdownState();
+  if (phase !== "live") return <EndedView />;
   return (
     <LocationProvider>
       <Shell>

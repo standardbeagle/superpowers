@@ -4,7 +4,7 @@ import { createWsHub } from "./ws";
 import { createEventsWriter } from "./events-writer";
 import { createIdempotencyStore } from "./idempotency";
 import { createDecisionsRepo } from "./decisions-repo";
-import { handle, flushAllDemo } from "./routes";
+import { handle, flushAllDemo, type RouteCtx } from "./routes";
 import type { Server } from "bun";
 
 export interface CliOptions {
@@ -36,7 +36,7 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   const events = createEventsWriter(opts.sessionDir, { rotateBytes: 10_000_000 });
   const idempotency = createIdempotencyStore();
   const decisions = createDecisionsRepo(opts.sessionDir);
-  const ctx = { screens, broadcast, events, idempotency, decisions, docRoots: opts.docRoots };
+  const ctx: RouteCtx = { screens, broadcast, events, idempotency, decisions, docRoots: opts.docRoots };
   screens.onChange((kind, id) => {
     broadcast.push("refresh", { kind: "screen", id, action: kind });
   });
@@ -64,16 +64,25 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   writeServerInfo(opts.sessionDir, info);
   process.stdout.write(JSON.stringify({ type: "server_ready", ...info }) + "\n");
 
-  const shutdown = async () => {
+  let shuttingDown = false;
+  const shutdown = async (reason: string = "stopped") => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    // Tell any connected clients we are going away, then give them a brief
+    // window to paint the "shutting down" screen before we close sockets.
+    broadcast.push("shutdown", { reason });
+    await new Promise(r => setTimeout(r, 1500));
     await flushAllDemo(ctx);
     broadcast.closeAll();
     await screens.close();
-    clearServerInfo(opts.sessionDir, "stopped");
+    clearServerInfo(opts.sessionDir, reason);
     server.stop(true);
   };
 
-  process.on("SIGTERM", () => { void shutdown().then(() => process.exit(0)); });
-  process.on("SIGINT",  () => { void shutdown().then(() => process.exit(0)); });
+  ctx.shutdown = shutdown;
+
+  process.on("SIGTERM", () => { void shutdown("stopped").then(() => process.exit(0)); });
+  process.on("SIGINT",  () => { void shutdown("interrupted").then(() => process.exit(0)); });
 
   return { url, port: server.port, server, sessionDir: opts.sessionDir, shutdown };
 }
