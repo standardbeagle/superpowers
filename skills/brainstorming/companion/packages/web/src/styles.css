@@ -40,10 +40,22 @@ fieldset legend { font-weight: 600; padding: 0 6px; }
 .screen-form fieldset { padding: 10px 12px 6px; margin: 0; }
 .screen-form fieldset .option { padding: 3px 0; }
 .screen-form button[type="submit"] { align-self: flex-start; min-width: 120px; }
-.cm-host { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; min-height: 120px; }
+.cm-host { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; min-height: 120px; background: #0b0d12; }
+.cm-host .cm-editor { background: #0b0d12; color: var(--fg); height: 100%; outline: none; }
+.cm-host .cm-editor.cm-focused { outline: none; }
+.cm-host .cm-scroller { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.55; }
+.cm-host .cm-content { caret-color: var(--accent); padding: 6px 0; }
+.cm-host .cm-gutters { background: #13161c; color: var(--muted); border-right: 1px solid var(--border); }
+.cm-host .cm-gutterElement { padding: 0 8px 0 6px; }
+.cm-host .cm-activeLine { background: rgba(122, 162, 247, 0.07); }
+.cm-host .cm-activeLineGutter { background: rgba(122, 162, 247, 0.12); color: var(--fg); }
+.cm-host .cm-cursor { border-left-color: var(--accent); }
+.cm-host .cm-selectionBackground,
+.cm-host .cm-focused .cm-selectionBackground,
+.cm-host ::selection { background: rgba(122, 162, 247, 0.25) !important; }
 .muted { color: var(--muted); font-weight: 400; font-size: 12px; }
 .badge-private { background: #eab308; color: #0f1115; font-size: 10px; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
-.file-edit { border: 1px dashed #eab308; border-radius: 6px; padding: 12px; }
+.file-edit { border: 1px dashed #eab308; border-radius: 6px; padding: 12px; background: rgba(234, 179, 8, 0.04); }
 .sidebar-help { color: var(--muted); font-size: 12px; margin-bottom: 12px; display: block; }
 .sidebar-help:hover { color: var(--fg); }
 
