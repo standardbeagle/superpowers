@@ -1,6 +1,7 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { getScreen, submitAnswer } from "../lib/api";
 import { renderMarkdown } from "../lib/markdown";
+import { renderAllMermaidBlocks } from "../lib/mermaid";
 import { RadioInput } from "../inputs/RadioInput";
 import { MultiInput } from "../inputs/MultiInput";
 import { TextInput } from "../inputs/TextInput";
@@ -11,8 +12,10 @@ export function ScreenView({ params }: { params: { id: string } }) {
   const [screen, setScreen] = useState<any>(null);
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [submitted, setSubmitted] = useState(false);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { void getScreen(params.id).then(setScreen); }, [params.id]);
+  useEffect(() => { if (bodyRef.current) void renderAllMermaidBlocks(bodyRef.current); }, [screen?.frontmatter?.id]);
   if (!screen) return <p>Loading…</p>;
   const { frontmatter: fm, body } = screen;
   if (fm.kind !== "question") return <p>Wrong kind for this view.</p>;
@@ -28,7 +31,7 @@ export function ScreenView({ params }: { params: { id: string } }) {
   return (
     <article class="screen">
       <h2>{fm.title}</h2>
-      <div class="markdown" dangerouslySetInnerHTML={{ __html: renderMarkdown(body) }} />
+      <div class="markdown" ref={bodyRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(body) }} />
       <form onSubmit={onSubmit} class="screen-form">
         {fm.inputs.map((def: any) => {
           switch (def.type) {

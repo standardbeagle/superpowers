@@ -1,13 +1,16 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { getScreen, updateDecision } from "../lib/api";
 import { renderMarkdown } from "../lib/markdown";
+import { renderAllMermaidBlocks } from "../lib/mermaid";
 
 export function DecisionView({ params }: { params: { id: string } }) {
   const [screen, setScreen] = useState<any>(null);
   const [chosen, setChosen] = useState<string>("");
   const [note, setNote] = useState<string>("");
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { void getScreen(params.id).then(setScreen); }, [params.id]);
+  useEffect(() => { if (bodyRef.current) void renderAllMermaidBlocks(bodyRef.current); }, [screen?.frontmatter?.id]);
   if (!screen) return <p>Loading…</p>;
   const fm = screen.frontmatter;
   if (fm.kind !== "decision") return <p>Wrong kind.</p>;
@@ -20,7 +23,7 @@ export function DecisionView({ params }: { params: { id: string } }) {
     <article>
       <h2>{fm.title}</h2>
       <p><span class={`badge badge-${fm.status}`} /> status: <strong>{fm.status}</strong></p>
-      <div class="markdown" dangerouslySetInnerHTML={{ __html: renderMarkdown(screen.body) }} />
+      <div class="markdown" ref={bodyRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(screen.body) }} />
       <fieldset style={{ marginTop: 16 }}>
         <legend>Options</legend>
         {fm.options.map((o: any) => (

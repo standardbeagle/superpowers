@@ -1,11 +1,13 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { getScreen } from "../lib/api";
 import { renderMarkdown } from "../lib/markdown";
+import { renderAllMermaidBlocks } from "../lib/mermaid";
 
 export function DemoView({ params }: { params: { id: string } }) {
   const [screen, setScreen] = useState<any>(null);
   const [html, setHtml] = useState<string>("");
   const [note, setNote] = useState<string>("");
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { void getScreen(params.id).then(setScreen); }, [params.id]);
 
@@ -24,6 +26,8 @@ export function DemoView({ params }: { params: { id: string } }) {
       setHtml(`<!doctype html><html><head><style>${css}</style></head><body>${htmlBody}${bridge}<script>${js}</script></body></html>`);
     })();
   }, [screen?.frontmatter?.id]);
+
+  useEffect(() => { if (bodyRef.current) void renderAllMermaidBlocks(bodyRef.current); }, [screen?.frontmatter?.id]);
 
   useEffect(() => {
     function listener(e: MessageEvent) {
@@ -52,7 +56,7 @@ export function DemoView({ params }: { params: { id: string } }) {
   return (
     <article>
       <h2>{fm.title}</h2>
-      <div class="markdown" dangerouslySetInnerHTML={{ __html: renderMarkdown(screen.body) }} />
+      <div class="markdown" ref={bodyRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(screen.body) }} />
       <iframe
         class="demo-frame"
         sandbox="allow-scripts"
