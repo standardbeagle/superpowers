@@ -10,7 +10,14 @@
   "dependencies": {
     "preact": "^10.22.0",
     "preact-iso": "^2.6.0",
-    "markdown-it": "^14.1.0"
+    "markdown-it": "^14.1.0",
+    "@codemirror/state": "^6.4.0",
+    "@codemirror/view": "^6.26.0",
+    "@codemirror/commands": "^6.3.0",
+    "@codemirror/language": "^6.10.0",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-yaml": "^6.1.0",
+    "@codemirror/lang-javascript": "^6.2.0"
   },
   "devDependencies": {
     "vite": "^5.2.0",
