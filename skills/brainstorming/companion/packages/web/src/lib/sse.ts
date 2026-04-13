@@ -4,21 +4,37 @@ export interface RefreshEvent { kind: "screen"|"decision"; id: string; action?: 
 
 type Listener = (ev: RefreshEvent) => void;
 
-let es: EventSource | null = null;
+let ws: WebSocket | null = null;
+let reconnectTimer: number | null = null;
 const listeners = new Set<Listener>();
 
+function url() {
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  return `${proto}://${location.host}/api/stream`;
+}
+
 function ensure() {
-  if (es) return;
-  es = new EventSource("/api/stream");
-  es.addEventListener("refresh", (e: MessageEvent) => {
+  if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+  ws = new WebSocket(url());
+  ws.addEventListener("message", (e) => {
     try {
-      const parsed = JSON.parse(e.data) as RefreshEvent;
-      listeners.forEach(l => l(parsed));
-    } catch { /* ignore malformed payload */ }
+      const msg = JSON.parse(e.data);
+      if (msg && msg.event === "refresh" && msg.data) {
+        listeners.forEach(l => l(msg.data as RefreshEvent));
+      }
+    } catch { /* ignore malformed frame */ }
   });
-  es.addEventListener("error", () => {
-    // Let the browser retry via its built-in EventSource reconnect behaviour.
-  });
+  const reconnect = () => {
+    ws = null;
+    if (reconnectTimer !== null) return;
+    if (listeners.size === 0) return;
+    reconnectTimer = window.setTimeout(() => {
+      reconnectTimer = null;
+      ensure();
+    }, 1000);
+  };
+  ws.addEventListener("close", reconnect);
+  ws.addEventListener("error", reconnect);
 }
 
 export function useRefresh(onEvent: Listener) {

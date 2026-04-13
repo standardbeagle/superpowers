@@ -1,6 +1,6 @@
 import { ensureSessionDir, writeServerInfo, clearServerInfo } from "./session";
 import { createScreensRepo } from "./screens-repo";
-import { createSseHub } from "./sse";
+import { createWsHub } from "./ws";
 import { createEventsWriter } from "./events-writer";
 import { createIdempotencyStore } from "./idempotency";
 import { createDecisionsRepo } from "./decisions-repo";
@@ -30,19 +30,30 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   ensureSessionDir(opts.sessionDir);
 
   const screens = await createScreensRepo(opts.sessionDir);
-  const sse = createSseHub();
+  const broadcast = createWsHub();
   const events = createEventsWriter(opts.sessionDir, { rotateBytes: 10_000_000 });
   const idempotency = createIdempotencyStore();
   const decisions = createDecisionsRepo(opts.sessionDir);
-  const ctx = { screens, sse, events, idempotency, decisions, docRoots: opts.docRoots };
+  const ctx = { screens, broadcast, events, idempotency, decisions, docRoots: opts.docRoots };
   screens.onChange((kind, id) => {
-    sse.push("refresh", { kind: "screen", id, action: kind });
+    broadcast.push("refresh", { kind: "screen", id, action: kind });
   });
 
   const server = Bun.serve({
     hostname: opts.host,
     port: opts.port ?? 0,
-    fetch(req) { return handle(req, ctx); },
+    fetch(req, srv) {
+      const url = new URL(req.url);
+      if (req.method === "GET" && url.pathname === "/api/stream") {
+        return broadcast.tryUpgrade(req, srv);
+      }
+      return handle(req, ctx);
+    },
+    websocket: {
+      open(ws) { broadcast.open(ws); },
+      close(ws) { broadcast.close(ws); },
+      message() { /* client→server frames unused in v1 */ },
+    },
   });
 
   const urlHost = opts.urlHost ?? opts.host;
@@ -53,7 +64,7 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
 
   const shutdown = async () => {
     await flushAllDemo(ctx);
-    sse.close();
+    broadcast.closeAll();
     await screens.close();
     clearServerInfo(opts.sessionDir, "stopped");
     server.stop(true);

@@ -1,5 +1,4 @@
 import type { ScreensRepo } from "./screens-repo";
-import type { SseHub } from "./sse";
 import type { EventsWriter } from "./events-writer";
 import type { IdempotencyStore } from "./idempotency";
 import type { DecisionsRepo } from "./decisions-repo";
@@ -78,7 +77,7 @@ function serveStatic(url: URL): Response | undefined {
 
 export interface RouteCtx {
   screens: ScreensRepo;
-  sse: SseHub;
+  broadcast: { push(event: string, data: unknown): void };
   events: EventsWriter;
   idempotency: IdempotencyStore;
   decisions: DecisionsRepo;
@@ -122,9 +121,6 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     const s = ctx.screens.get(id);
     if (!s) return new Response("not found", { status: 404 });
     return Response.json({ frontmatter: s.frontmatter, body: s.body });
-  }
-  if (req.method === "GET" && url.pathname === "/api/stream") {
-    return ctx.sse.handle(req);
   }
   if (req.method === "POST" && url.pathname === "/api/answer") {
     const body = await req.json().catch(() => null) as {
@@ -202,7 +198,7 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
       return new Response((err as Error).message, { status: 404 });
     }
     await ctx.events.append({ type: "decision", id, status: body.status, chosen_option: body.chosen_option, note: body.note });
-    ctx.sse.push("refresh", { kind: "decision", id });
+    ctx.broadcast.push("refresh", { kind: "decision", id });
     return Response.json({ ok: true });
   }
   if (req.method === "GET" && url.pathname === "/api/docs") {
