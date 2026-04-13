@@ -24,7 +24,15 @@ export function createDecisionsRepo(sessionDir: string): DecisionsRepo {
       const { data } = matter(raw);
       const front = ScreenFrontmatter.parse(data);
       if (front.kind !== "decision") return undefined;
-      return { id: front.id, title: front.title, status: front.status, depends_on: front.depends_on, path };
+      return {
+        id: front.id,
+        title: front.title,
+        status: front.status,
+        depends_on: front.depends_on,
+        chosen_option: front.chosen_option,
+        note: front.note,
+        path,
+      };
     } catch {
       return undefined;
     }

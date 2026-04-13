@@ -1,5 +1,12 @@
 export interface ScreenSummary { id: string; kind: "question"|"demo"|"decision"; title: string; pinned: boolean; }
-export interface DecisionSummary { id: string; title: string; status: "proposed"|"approved"|"revised"|"rejected"; }
+export interface DecisionSummary {
+  id: string;
+  title: string;
+  status: "proposed"|"approved"|"revised"|"rejected";
+  depends_on?: string[];
+  chosen_option?: string;
+  note?: string;
+}
 export interface DocEntry { root: string; path: string; rel: string; }
 
 export async function listScreens(): Promise<ScreenSummary[]> {

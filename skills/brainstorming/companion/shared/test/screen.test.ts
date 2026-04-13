@@ -103,3 +103,22 @@ test("decision screen defaults depends_on to empty array", () => {
     expect(parsed.depends_on).toEqual([]);
   }
 });
+
+test("decision screen parses chosen_option and note when present", () => {
+  const parsed = ScreenFrontmatter.parse({
+    kind: "decision",
+    id: "d1",
+    title: "T",
+    status: "approved",
+    chosen_option: "a",
+    note: "because",
+    options: [
+      { id: "a", label: "A" },
+      { id: "b", label: "B" },
+    ],
+  });
+  if (parsed.kind === "decision") {
+    expect(parsed.chosen_option).toBe("a");
+    expect(parsed.note).toBe("because");
+  }
+});

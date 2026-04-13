@@ -85,6 +85,8 @@ export const DecisionScreen = z.object({
   status: z.enum(["proposed", "approved", "revised", "rejected"]).default("proposed"),
   options: z.array(DecisionOption).min(2),
   depends_on: z.array(z.string()).default([]),
+  chosen_option: z.string().optional(),
+  note: z.string().optional(),
 });
 
 export const ScreenFrontmatter = z.discriminatedUnion("kind", [QuestionScreen, DemoScreen, DecisionScreen]);

@@ -28,6 +28,16 @@ test("list carries depends_on", () => {
   expect(d!.depends_on).toEqual(["d1"]);
 });
 
+test("list carries chosen_option and note when set", () => {
+  writeFileSync(join(dir, "decisions", "d3.md"),
+    `---\nkind: decision\nid: d3\ntitle: T3\nstatus: approved\nchosen_option: a\nnote: because\noptions:\n  - {id: a, label: A}\n  - {id: b, label: B}\n---\n`);
+  const repo = createDecisionsRepo(dir);
+  const d = repo.list().find(x => x.id === "d3");
+  expect(d).toBeTruthy();
+  expect(d!.chosen_option).toBe("a");
+  expect(d!.note).toBe("because");
+});
+
 test("updateStatus rewrites only the status field", () => {
   writeFileSync(join(dir, "decisions", "d1.md"),
     `---\nkind: decision\nid: d1\ntitle: T\nstatus: proposed\noptions:\n  - {id: a, label: A}\n  - {id: b, label: B}\n---\n\n## Context\nSome text`);
