@@ -1,6 +1,8 @@
 import { ensureSessionDir, writeServerInfo, clearServerInfo } from "./session";
 import { createScreensRepo } from "./screens-repo";
 import { createSseHub } from "./sse";
+import { createEventsWriter } from "./events-writer";
+import { createIdempotencyStore } from "./idempotency";
 import { handle } from "./routes";
 import type { Server } from "bun";
 
@@ -28,7 +30,9 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
 
   const screens = await createScreensRepo(opts.sessionDir);
   const sse = createSseHub();
-  const ctx = { screens, sse };
+  const events = createEventsWriter(opts.sessionDir, { rotateBytes: 10_000_000 });
+  const idempotency = createIdempotencyStore();
+  const ctx = { screens, sse, events, idempotency };
   screens.onChange((kind, id) => {
     sse.push("refresh", { kind: "screen", id, action: kind });
   });
