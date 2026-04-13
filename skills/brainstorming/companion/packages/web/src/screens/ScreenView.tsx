@@ -14,7 +14,12 @@ export function ScreenView({ params }: { params: { id: string } }) {
   const [submitted, setSubmitted] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { void getScreen(params.id).then(setScreen); }, [params.id]);
+  useEffect(() => {
+    setScreen(null);
+    setValues({});
+    setSubmitted(false);
+    void getScreen(params.id).then(setScreen);
+  }, [params.id]);
   useEffect(() => { if (bodyRef.current) void renderAllMermaidBlocks(bodyRef.current); }, [screen?.frontmatter?.id]);
   if (!screen) return <p>Loading…</p>;
   const { frontmatter: fm, body } = screen;

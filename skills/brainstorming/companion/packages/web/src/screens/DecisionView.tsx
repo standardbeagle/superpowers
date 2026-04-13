@@ -9,7 +9,12 @@ export function DecisionView({ params }: { params: { id: string } }) {
   const [note, setNote] = useState<string>("");
   const bodyRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { void getDecision(params.id).then(setScreen); }, [params.id]);
+  useEffect(() => {
+    setScreen(null);
+    setChosen("");
+    setNote("");
+    void getDecision(params.id).then(setScreen);
+  }, [params.id]);
   useEffect(() => { if (bodyRef.current) void renderAllMermaidBlocks(bodyRef.current); }, [screen?.frontmatter?.id]);
   if (!screen) return <p>Loading…</p>;
   const fm = screen.frontmatter;

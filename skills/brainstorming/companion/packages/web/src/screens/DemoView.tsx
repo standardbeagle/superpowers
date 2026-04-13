@@ -9,7 +9,12 @@ export function DemoView({ params }: { params: { id: string } }) {
   const [note, setNote] = useState<string>("");
   const bodyRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { void getScreen(params.id).then(setScreen); }, [params.id]);
+  useEffect(() => {
+    setScreen(null);
+    setHtml("");
+    setNote("");
+    void getScreen(params.id).then(setScreen);
+  }, [params.id]);
 
   useEffect(() => {
     if (!screen || screen.frontmatter.kind !== "demo") return;
