@@ -227,23 +227,45 @@ Wait for the user's response. If they request changes, make them and re-run the 
 - **Incremental validation** - Present design in sections, get approval before moving on
 - **Be flexible** - Go back and clarify when something doesn't make sense
 
-## Visual Companion
+## Visual Companion (mini-IDE)
 
-A browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
+A browser-based companion that renders markdown+YAML screens Claude writes into the session directory. Replaces the legacy fragment-based companion (which has been removed from this fork). Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
 
 **Offering the companion:** When you anticipate that upcoming questions will involve visual content (mockups, layouts, diagrams), offer it once for consent:
-> "Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. This feature is still new and can be token-intensive. Want to try it? (Requires opening a local URL)"
+> "Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. Want to try it? (Requires opening a local URL)"
 
-**This offer MUST be its own message.** Do not combine it with clarifying questions, context summaries, or any other content. The message should contain ONLY the offer above and nothing else. Wait for the user's response before continuing. If they decline, proceed with text-only brainstorming.
+**This offer MUST be its own message.** Do not combine it with clarifying questions, context summaries, or any other content.
 
-**Per-question decision:** Even after the user accepts, decide FOR EACH QUESTION whether to use the browser or the terminal. The test: **would the user understand this better by seeing it than reading it?**
+### Starting the companion
 
-- **Use the browser** for content that IS visual — mockups, wireframes, layout comparisons, architecture diagrams, side-by-side visual designs
-- **Use the terminal** for content that is text — requirements questions, conceptual choices, tradeoff lists, A/B/C/D text options, scope decisions
+```bash
+bun run skills/brainstorming/companion/packages/server/src/cli.ts start \
+  --session-dir /path/to/project/.superpowers/brainstorm/<session> \
+  --doc-root /path/to/project/docs \
+  --doc-root /path/to/project/specs
+```
 
-A question about a UI topic is not automatically a visual question. "What does personality mean in this context?" is a conceptual question — use the terminal. "Which wizard layout works better?" is a visual question — use the browser.
+The server writes `$SESSION_DIR/server-info` and prints a JSON line with `{url, port, pid}`. Tell the user to open the URL.
 
-Note: `AskUserQuestion` previews can replace browser-based comparisons for simple layout/mockup choices. Use the browser only when the visual complexity genuinely exceeds what ASCII previews can convey.
+### Streaming events back into this session
 
-If they agree to the companion, read the detailed guide before proceeding:
-`skills/brainstorming/visual-companion.md`
+After `companion start`, set up the Monitor once per session:
+
+```
+Monitor(
+  description: "brainstorming companion events",
+  command:     "tail -n 0 -F $SESSION_DIR/events.jsonl | grep --line-buffered -v '^$'",
+  persistent:  true,
+  timeout_ms:  3600000
+)
+```
+
+Each JSON line in `events.jsonl` becomes one notification. Silent means free — no tokens while the user reads.
+
+### Writing screens
+
+See `skills/brainstorming/companion/docs/screen-format.md` for the full reference. Three kinds: `question`, `demo`, `decision`. Each is one markdown file with YAML frontmatter under `$SESSION_DIR/screens/`.
+
+### Privacy
+
+Inputs with `private: true` (and all `file-edit` inputs) route through a separate save path that writes directly to the target file and emits only a `saved` event with a sha256 digest — contents never reach Claude through the companion. This does NOT prevent Claude from using its own file-reading tools on the same path; for real secrecy, `.gitignore` it and do not ask Claude to read it.
