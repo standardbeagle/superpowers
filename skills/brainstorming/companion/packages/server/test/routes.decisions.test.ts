@@ -20,6 +20,27 @@ test("GET /api/decisions lists decisions", async () => {
   });
 });
 
+test("GET /api/decisions/:id returns frontmatter + body", async () => {
+  await withServer(async (url, dir) => {
+    writeFileSync(join(dir, "decisions", "d2.md"),
+      `---\nkind: decision\nid: d2\ntitle: T\nstatus: proposed\noptions:\n  - {id: a, label: A}\n  - {id: b, label: B}\n---\n\n## Context\nSome text`);
+    const res = await fetch(`${url}/api/decisions/d2`);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.frontmatter.id).toBe("d2");
+    expect(body.frontmatter.kind).toBe("decision");
+    expect(body.body).toContain("## Context");
+    expect(body.body).toContain("Some text");
+  });
+});
+
+test("GET /api/decisions/:id returns 404 for unknown id", async () => {
+  await withServer(async (url, dir) => {
+    const res = await fetch(`${url}/api/decisions/nope`);
+    expect(res.status).toBe(404);
+  });
+});
+
 test("POST /api/decisions/:id updates status and appends event", async () => {
   await withServer(async (url, dir) => {
     writeFileSync(join(dir, "decisions", "d1.md"),

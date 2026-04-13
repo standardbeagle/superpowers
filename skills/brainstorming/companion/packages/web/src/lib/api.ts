@@ -11,6 +11,9 @@ export async function getScreen(id: string) {
 export async function listDecisions(): Promise<DecisionSummary[]> {
   return (await fetch("/api/decisions")).json();
 }
+export async function getDecision(id: string) {
+  return (await fetch(`/api/decisions/${encodeURIComponent(id)}`)).json();
+}
 export async function listDocs(): Promise<DocEntry[]> {
   return (await fetch("/api/docs")).json();
 }

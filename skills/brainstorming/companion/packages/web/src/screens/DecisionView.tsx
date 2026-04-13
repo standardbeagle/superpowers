@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { getScreen, updateDecision } from "../lib/api";
+import { getDecision, updateDecision } from "../lib/api";
 import { renderMarkdown } from "../lib/markdown";
 import { renderAllMermaidBlocks } from "../lib/mermaid";
 
@@ -9,7 +9,7 @@ export function DecisionView({ params }: { params: { id: string } }) {
   const [note, setNote] = useState<string>("");
   const bodyRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { void getScreen(params.id).then(setScreen); }, [params.id]);
+  useEffect(() => { void getDecision(params.id).then(setScreen); }, [params.id]);
   useEffect(() => { if (bodyRef.current) void renderAllMermaidBlocks(bodyRef.current); }, [screen?.frontmatter?.id]);
   if (!screen) return <p>Loading…</p>;
   const fm = screen.frontmatter;

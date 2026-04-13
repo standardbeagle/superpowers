@@ -3,9 +3,15 @@ import { join } from "path";
 import matter from "gray-matter";
 import { ScreenFrontmatter, type Decision, type DecisionStatus } from "@companion/shared";
 
+export interface DecisionDetail {
+  frontmatter: import("@companion/shared").ScreenFrontmatter;
+  body: string;
+}
+
 export interface DecisionsRepo {
   list(): Decision[];
   get(id: string): Decision | undefined;
+  getById(id: string): DecisionDetail | undefined;
   updateStatus(id: string, status: DecisionStatus, chosen?: string, note?: string): void;
 }
 
@@ -35,6 +41,16 @@ export function createDecisionsRepo(sessionDir: string): DecisionsRepo {
     return list().find(d => d.id === id);
   }
 
+  function getById(id: string): DecisionDetail | undefined {
+    const d = get(id);
+    if (!d) return undefined;
+    const raw = readFileSync(d.path, "utf8");
+    const { data, content } = matter(raw);
+    const front = ScreenFrontmatter.parse(data);
+    if (front.kind !== "decision") return undefined;
+    return { frontmatter: front, body: content };
+  }
+
   function updateStatus(id: string, status: DecisionStatus, chosen?: string, note?: string): void {
     const d = get(id);
     if (!d) throw new Error(`unknown decision ${id}`);
@@ -49,5 +65,5 @@ export function createDecisionsRepo(sessionDir: string): DecisionsRepo {
     renameSync(tmp, d.path);
   }
 
-  return { list, get, updateStatus };
+  return { list, get, getById, updateStatus };
 }
