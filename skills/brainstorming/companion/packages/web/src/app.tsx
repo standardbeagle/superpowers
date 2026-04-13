@@ -4,6 +4,7 @@ import { ScreenView } from "./screens/ScreenView";
 import { DemoView } from "./screens/DemoView";
 import { DecisionView } from "./screens/DecisionView";
 import { DocsView } from "./screens/DocsView";
+import { HelpView } from "./screens/HelpView";
 
 export function App() {
   return (
@@ -15,6 +16,7 @@ export function App() {
           <Route path="/demo/:id" component={DemoView} />
           <Route path="/decisions/:id" component={DecisionView} />
           <Route path="/docs/:path*" component={DocsView} />
+          <Route path="/help" component={HelpView} />
           <Route default component={NotFound} />
         </Router>
       </Shell>

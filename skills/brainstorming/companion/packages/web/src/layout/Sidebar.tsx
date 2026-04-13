@@ -18,6 +18,7 @@ export function Sidebar() {
 
   return (
     <nav class="sidebar-nav">
+      <a href="/help" class="sidebar-item sidebar-help">? Help</a>
       <Section title="Screens">
         {screens.map(s => (
           <a

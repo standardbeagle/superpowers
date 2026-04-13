@@ -8,6 +8,7 @@ import { existsSync, readdirSync, statSync, readFileSync } from "fs";
 import { join, relative, resolve, dirname } from "path";
 
 const WEB_DIST = resolve(import.meta.dir, "..", "..", "web", "dist");
+const HELP_MD = resolve(import.meta.dir, "..", "..", "..", "docs", "screen-format.md");
 
 const demoWindow: Array<{ ts: number; screen: string }> = [];
 let dropped = 0;
@@ -174,6 +175,11 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     if (relative(base, target).startsWith("..")) return new Response("forbidden", { status: 403 });
     if (!existsSync(target)) return new Response("not found", { status: 404 });
     return new Response(readFileSync(target, "utf8"));
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/help") {
+    if (!existsSync(HELP_MD)) return new Response("help file not found", { status: 404 });
+    return new Response(readFileSync(HELP_MD, "utf8"), { headers: { "content-type": "text/markdown" } });
   }
 
   if (req.method === "POST" && url.pathname === "/api/demo-event") {
