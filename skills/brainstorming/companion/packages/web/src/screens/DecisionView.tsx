@@ -29,9 +29,13 @@ export function DecisionView({ params }: { params: { id: string } }) {
     .filter((d: DecisionSummary | undefined): d is DecisionSummary => !!d);
 
   const dependents = all.filter(d =>
-    Array.isArray(d.depends_on) && d.depends_on.includes(fm.id) && d.status === "proposed"
+    Array.isArray(d.depends_on) && d.depends_on.includes(fm.id)
   );
-  const nextUp = dependents[0];
+  const unanswered = dependents.filter(d => d.status === "proposed");
+  const nextUp = unanswered[0] ?? dependents[0];
+  const nextUpLabel = nextUp
+    ? (nextUp.status === "proposed" ? "Next" : "Continue to")
+    : null;
 
   async function submit(status: "approved"|"revised"|"rejected") {
     await updateDecision(fm.id, status, chosen || undefined, note || undefined);
@@ -96,7 +100,7 @@ export function DecisionView({ params }: { params: { id: string } }) {
         <div class="next-up">
           {nextUp ? (
             <a class="next-up-btn" href={`/decisions/${nextUp.id}`}>
-              Next: {nextUp.title} →
+              {nextUpLabel}: {nextUp.title} →
             </a>
           ) : (
             <p class="muted">Done with this branch.</p>
