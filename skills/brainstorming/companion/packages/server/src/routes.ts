@@ -2,6 +2,7 @@ import type { ScreensRepo } from "./screens-repo";
 import type { SseHub } from "./sse";
 import type { EventsWriter } from "./events-writer";
 import type { IdempotencyStore } from "./idempotency";
+import type { DecisionsRepo } from "./decisions-repo";
 import { assertDeclaredPath, savePrivate } from "./privacy";
 
 export interface RouteCtx {
@@ -9,6 +10,7 @@ export interface RouteCtx {
   sse: SseHub;
   events: EventsWriter;
   idempotency: IdempotencyStore;
+  decisions: DecisionsRepo;
 }
 
 export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
@@ -87,6 +89,24 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
       await ctx.events.append({ type: "save_error", screen_id: body.screen_id, name: body.name, path: body.path, errno });
       return new Response("save failed", { status: 500 });
     }
+  }
+  if (req.method === "GET" && url.pathname === "/api/decisions") {
+    return Response.json(ctx.decisions.list());
+  }
+  if (req.method === "POST" && url.pathname.startsWith("/api/decisions/")) {
+    const id = url.pathname.slice("/api/decisions/".length);
+    const body = await req.json().catch(() => null) as {
+      status?: "approved"|"revised"|"rejected"|"proposed"; chosen_option?: string; note?: string;
+    } | null;
+    if (!body?.status) return new Response("bad request", { status: 400 });
+    try {
+      ctx.decisions.updateStatus(id, body.status, body.chosen_option, body.note);
+    } catch (err) {
+      return new Response((err as Error).message, { status: 404 });
+    }
+    await ctx.events.append({ type: "decision", id, status: body.status, chosen_option: body.chosen_option, note: body.note });
+    ctx.sse.push("refresh", { kind: "decision", id });
+    return Response.json({ ok: true });
   }
   return new Response("not found", { status: 404 });
 }
