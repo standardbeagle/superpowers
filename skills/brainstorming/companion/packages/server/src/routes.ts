@@ -2,6 +2,7 @@ import type { ScreensRepo } from "./screens-repo";
 import type { SseHub } from "./sse";
 import type { EventsWriter } from "./events-writer";
 import type { IdempotencyStore } from "./idempotency";
+import { assertDeclaredPath, savePrivate } from "./privacy";
 
 export interface RouteCtx {
   screens: ScreensRepo;
@@ -57,6 +58,35 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     }
     await ctx.events.append({ type: "answer", screen_id: body.screen_id, inputs: publicInputs });
     return Response.json({ ok: true });
+  }
+  if (req.method === "POST" && url.pathname === "/api/private-save") {
+    const body = await req.json().catch(() => null) as {
+      screen_id?: string; name?: string; path?: string; contents?: string;
+    } | null;
+    if (!body?.screen_id || !body.name || !body.path || typeof body.contents !== "string") {
+      return new Response("bad request", { status: 400 });
+    }
+    try {
+      assertDeclaredPath(ctx.screens, body.screen_id, body.path);
+    } catch (err) {
+      return new Response((err as Error).message, { status: 400 });
+    }
+    try {
+      const { bytes, sha256 } = savePrivate(body.path, body.contents);
+      await ctx.events.append({
+        type: "saved",
+        screen_id: body.screen_id,
+        name: body.name,
+        path: body.path,
+        bytes,
+        sha256,
+      });
+      return Response.json({ ok: true, bytes, sha256 });
+    } catch (err) {
+      const errno = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
+      await ctx.events.append({ type: "save_error", screen_id: body.screen_id, name: body.name, path: body.path, errno });
+      return new Response("save failed", { status: 500 });
+    }
   }
   return new Response("not found", { status: 404 });
 }
