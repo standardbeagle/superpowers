@@ -74,3 +74,32 @@ test("decision screen with options parses", () => {
   });
   expect(parsed.kind).toBe("decision");
 });
+
+test("decision screen parses depends_on", () => {
+  const parsed = ScreenFrontmatter.parse({
+    kind: "decision",
+    id: "d2",
+    title: "Depends on auth",
+    depends_on: ["d1"],
+    options: [
+      { id: "a", label: "A" },
+      { id: "b", label: "B" },
+    ],
+  });
+  expect(parsed.kind).toBe("decision");
+  if (parsed.kind === "decision") {
+    expect(parsed.depends_on).toEqual(["d1"]);
+  }
+});
+
+test("decision screen defaults depends_on to empty array", () => {
+  const parsed = ScreenFrontmatter.parse({
+    kind: "decision",
+    id: "d3",
+    title: "No deps",
+    options: [{ id: "a", label: "A" }, { id: "b", label: "B" }],
+  });
+  if (parsed.kind === "decision") {
+    expect(parsed.depends_on).toEqual([]);
+  }
+});

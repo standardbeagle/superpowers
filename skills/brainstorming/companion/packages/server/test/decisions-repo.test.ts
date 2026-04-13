@@ -18,6 +18,16 @@ test("list parses decision files", () => {
   expect(list[0].status).toBe("proposed");
 });
 
+test("list carries depends_on", () => {
+  writeFileSync(join(dir, "decisions", "d2.md"),
+    `---\nkind: decision\nid: d2\ntitle: T2\nstatus: proposed\ndepends_on: [d1]\noptions:\n  - {id: a, label: A}\n  - {id: b, label: B}\n---\n`);
+  const repo = createDecisionsRepo(dir);
+  const list = repo.list();
+  const d = list.find(x => x.id === "d2");
+  expect(d).toBeTruthy();
+  expect(d!.depends_on).toEqual(["d1"]);
+});
+
 test("updateStatus rewrites only the status field", () => {
   writeFileSync(join(dir, "decisions", "d1.md"),
     `---\nkind: decision\nid: d1\ntitle: T\nstatus: proposed\noptions:\n  - {id: a, label: A}\n  - {id: b, label: B}\n---\n\n## Context\nSome text`);

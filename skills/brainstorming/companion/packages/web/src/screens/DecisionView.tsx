@@ -23,6 +23,17 @@ export function DecisionView({ params }: { params: { id: string } }) {
     <article>
       <h2>{fm.title}</h2>
       <p><span class={`badge badge-${fm.status}`} /> status: <strong>{fm.status}</strong></p>
+      {fm.depends_on && fm.depends_on.length > 0 && (
+        <p class="deps">
+          Depends on:{" "}
+          {fm.depends_on.map((id: string, i: number) => (
+            <>
+              {i > 0 && ", "}
+              <a href={`/decisions/${id}`}>{id}</a>
+            </>
+          ))}
+        </p>
+      )}
       <div class="markdown" ref={bodyRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(screen.body) }} />
       <fieldset style={{ marginTop: 16 }}>
         <legend>Options</legend>

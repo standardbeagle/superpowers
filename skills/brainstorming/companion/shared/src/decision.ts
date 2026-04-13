@@ -9,6 +9,7 @@ export const Decision = z.object({
   status: DecisionStatus,
   chosen_option: z.string().optional(),
   note: z.string().optional(),
+  depends_on: z.array(z.string()).default([]),
   path: z.string(),
 });
 export type Decision = z.infer<typeof Decision>;
