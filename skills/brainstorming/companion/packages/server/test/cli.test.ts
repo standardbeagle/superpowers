@@ -15,3 +15,8 @@ test("collects multiple doc-roots", () => {
   const opts = parseCliArgs(["start", "--session-dir", "/tmp/s1", "--doc-root", "./a", "--doc-root", "./b"]);
   expect(opts.docRoots).toHaveLength(2);
 });
+
+test("--reset flag defaults to false and toggles on when present", () => {
+  expect(parseCliArgs(["start", "--session-dir", "/tmp/s1"]).reset).toBe(false);
+  expect(parseCliArgs(["start", "--session-dir", "/tmp/s1", "--reset"]).reset).toBe(true);
+});

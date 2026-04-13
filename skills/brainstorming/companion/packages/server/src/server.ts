@@ -1,4 +1,4 @@
-import { ensureSessionDir, writeServerInfo, clearServerInfo } from "./session";
+import { ensureSessionDir, writeServerInfo, clearServerInfo, resetSessionDir } from "./session";
 import { createScreensRepo } from "./screens-repo";
 import { createWsHub } from "./ws";
 import { createEventsWriter } from "./events-writer";
@@ -16,6 +16,7 @@ export interface CliOptions {
   urlHost: string | undefined;
   foreground: boolean;
   emitNavigate: boolean;
+  reset?: boolean;
 }
 
 export interface RunningServer {
@@ -27,6 +28,7 @@ export interface RunningServer {
 }
 
 export async function runStart(opts: CliOptions): Promise<RunningServer> {
+  if (opts.reset) resetSessionDir(opts.sessionDir);
   ensureSessionDir(opts.sessionDir);
 
   const screens = await createScreensRepo(opts.sessionDir);

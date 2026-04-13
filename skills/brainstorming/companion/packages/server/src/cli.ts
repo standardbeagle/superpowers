@@ -11,6 +11,7 @@ interface Options {
   urlHost: string | undefined;
   foreground: boolean;
   emitNavigate: boolean;
+  reset: boolean;
 }
 
 export function parseCliArgs(argv: string[]): Options {
@@ -28,6 +29,7 @@ export function parseCliArgs(argv: string[]): Options {
       "url-host": { type: "string" },
       "foreground": { type: "boolean", default: false },
       "emit-navigate": { type: "boolean", default: false },
+      "reset": { type: "boolean", default: false },
     },
     strict: true,
   });
@@ -43,6 +45,7 @@ export function parseCliArgs(argv: string[]): Options {
     urlHost: values["url-host"],
     foreground: values.foreground ?? false,
     emitNavigate: values["emit-navigate"] ?? false,
+    reset: values.reset ?? false,
   };
 }
 
