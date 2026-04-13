@@ -4,6 +4,8 @@ import type { EventsWriter } from "./events-writer";
 import type { IdempotencyStore } from "./idempotency";
 import type { DecisionsRepo } from "./decisions-repo";
 import { assertDeclaredPath, savePrivate } from "./privacy";
+import { readdirSync, statSync, readFileSync } from "fs";
+import { join, relative } from "path";
 
 export interface RouteCtx {
   screens: ScreensRepo;
@@ -11,6 +13,26 @@ export interface RouteCtx {
   events: EventsWriter;
   idempotency: IdempotencyStore;
   decisions: DecisionsRepo;
+  docRoots: string[];
+}
+
+function listMarkdown(root: string): string[] {
+  const out: string[] = [];
+  function walk(d: string) {
+    for (const name of readdirSync(d)) {
+      const p = join(d, name);
+      const s = statSync(p);
+      if (s.isDirectory()) walk(p);
+      else if (name.endsWith(".md")) out.push(p);
+    }
+  }
+  walk(root);
+  return out;
+}
+
+function isUnder(root: string, target: string): boolean {
+  const rel = relative(root, target);
+  return !rel.startsWith("..") && !rel.startsWith("/");
 }
 
 export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
@@ -107,6 +129,22 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     await ctx.events.append({ type: "decision", id, status: body.status, chosen_option: body.chosen_option, note: body.note });
     ctx.sse.push("refresh", { kind: "decision", id });
     return Response.json({ ok: true });
+  }
+  if (req.method === "GET" && url.pathname === "/api/docs") {
+    const out: Array<{ root: string; path: string; rel: string }> = [];
+    for (const root of ctx.docRoots) {
+      for (const p of listMarkdown(root)) {
+        out.push({ root, path: p, rel: relative(root, p) });
+      }
+    }
+    return Response.json(out);
+  }
+  if (req.method === "GET" && url.pathname === "/api/docs/file") {
+    const p = url.searchParams.get("path");
+    if (!p || !ctx.docRoots.some(r => isUnder(r, p))) {
+      return new Response("forbidden", { status: 403 });
+    }
+    return new Response(readFileSync(p, "utf8"), { headers: { "content-type": "text/markdown" } });
   }
   return new Response("not found", { status: 404 });
 }

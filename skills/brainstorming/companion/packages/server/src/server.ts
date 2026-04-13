@@ -34,7 +34,7 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   const events = createEventsWriter(opts.sessionDir, { rotateBytes: 10_000_000 });
   const idempotency = createIdempotencyStore();
   const decisions = createDecisionsRepo(opts.sessionDir);
-  const ctx = { screens, sse, events, idempotency, decisions };
+  const ctx = { screens, sse, events, idempotency, decisions, docRoots: opts.docRoots };
   screens.onChange((kind, id) => {
     sse.push("refresh", { kind: "screen", id, action: kind });
   });
