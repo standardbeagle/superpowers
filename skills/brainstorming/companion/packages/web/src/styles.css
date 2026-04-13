@@ -9,3 +9,17 @@ button:hover { filter: brightness(1.1); }
 fieldset { border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
 input, textarea { background: #13161c; color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; width: 100%; box-sizing: border-box; }
 textarea { min-height: 120px; }
+.sidebar-heading { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0 4px; }
+.sidebar-section:first-child .sidebar-heading { margin-top: 0; }
+.sidebar-list { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; color: var(--fg); text-decoration: none; font-size: 13px; }
+.sidebar-item:hover { background: rgba(255,255,255,0.05); }
+.sidebar-item .dot { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; }
+.badge { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.badge-proposed { background: #eab308; }
+.badge-approved { background: #22c55e; }
+.badge-revised  { background: #f97316; }
+.badge-rejected { background: #ef4444; }
+.activity-list h4 { color: var(--muted); font-size: 11px; text-transform: uppercase; margin: 0 0 8px; }
+.activity-list ul { list-style: none; padding: 0; margin: 0; font-size: 12px; }
+.activity-list li { padding: 4px 0; color: var(--muted); }
