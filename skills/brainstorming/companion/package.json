@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": [
     "shared",
-    "packages/server"
+    "packages/server",
+    "packages/web"
   ],
   "scripts": {
     "build": "bun run --cwd packages/web build",

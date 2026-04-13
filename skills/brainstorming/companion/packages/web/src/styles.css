@@ -1,0 +1,11 @@
+:root { --bg: #0f1115; --fg: #e6e6e6; --accent: #7aa2f7; --muted: #6b7280; --border: #1f2937; font-family: ui-sans-serif, system-ui, sans-serif; }
+body { margin: 0; background: var(--bg); color: var(--fg); }
+.shell { display: grid; grid-template-columns: 260px 1fr 260px; height: 100vh; }
+.sidebar, .activity { border: 1px solid var(--border); padding: 12px; overflow: auto; background: #13161c; }
+.main { padding: 16px; overflow: auto; }
+a { color: var(--accent); }
+button { background: var(--accent); color: #0f1115; border: 0; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+button:hover { filter: brightness(1.1); }
+fieldset { border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+input, textarea { background: #13161c; color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; width: 100%; box-sizing: border-box; }
+textarea { min-height: 120px; }

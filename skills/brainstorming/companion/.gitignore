@@ -3,3 +3,4 @@ node_modules
 *.log
 .bun
 tmp-sessions/
+packages/web/dist/

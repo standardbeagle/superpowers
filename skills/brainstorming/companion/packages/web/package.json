@@ -1,0 +1,21 @@
+{
+  "name": "@companion/web",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "preact": "^10.22.0",
+    "preact-iso": "^2.6.0",
+    "markdown-it": "^14.1.0"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0",
+    "@preact/preset-vite": "^2.8.0",
+    "@companion/shared": "workspace:*",
+    "@types/markdown-it": "^14.1.0"
+  }
+}
