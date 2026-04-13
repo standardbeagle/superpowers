@@ -23,3 +23,9 @@ textarea { min-height: 120px; }
 .activity-list h4 { color: var(--muted); font-size: 11px; text-transform: uppercase; margin: 0 0 8px; }
 .activity-list ul { list-style: none; padding: 0; margin: 0; font-size: 12px; }
 .activity-list li { padding: 4px 0; color: var(--muted); }
+.markdown { line-height: 1.6; }
+.markdown h2 { margin-top: 24px; }
+.markdown code { background: #13161c; padding: 1px 4px; border-radius: 4px; }
+.markdown pre { background: #13161c; padding: 12px; border-radius: 6px; overflow: auto; }
+.screen-form { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; max-width: 720px; }
+.screen-form label { display: block; font-weight: 600; margin-bottom: 6px; }
