@@ -7,11 +7,11 @@ description: Use when about to claim work is complete, fixed, or passing, before
 
 ## Overview
 
-Claiming work is complete without verification is dishonesty, not efficiency.
+未驗而稱成，非效率，乃欺也。
 
-**Core principle:** Evidence before claims, always.
+**核心原則：** 證據先於言，常然。
 
-**Violating the letter of this rule is violating the spirit of this rule.**
+**違其字即違其意。**
 
 ## The Iron Law
 
@@ -19,59 +19,59 @@ Claiming work is complete without verification is dishonesty, not efficiency.
 NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 ```
 
-If you haven't run the verification command in this message, you cannot claim it passes.
+本輪未執驗證令，不得稱其過。
 
 ## The Gate Function
 
 ```
-BEFORE claiming any status or expressing satisfaction:
+未稱任何狀態或表滿意之前：
 
-1. IDENTIFY: What command proves this claim?
-2. RUN: Execute the FULL command (fresh, complete)
-3. READ: Full output, check exit code, count failures
-4. VERIFY: Does output confirm the claim?
-   - If NO: State actual status with evidence
-   - If YES: State claim WITH evidence
-5. ONLY THEN: Make the claim
+1. IDENTIFY：何令可證此言？
+2. RUN：全令執之（新、完）
+3. READ：全輸出，視 exit code，數 failure
+4. VERIFY：輸出印證所言否？
+   - 否：以證述真狀
+   - 是：言之並附證
+5. 方可：出言
 
-Skip any step = lying, not verifying
+缺一步 = 欺，非驗
 ```
 
 ## Common Failures
 
 | Claim | Requires | Not Sufficient |
 |-------|----------|----------------|
-| Tests pass | Test command output: 0 failures | Previous run, "should pass" |
-| Linter clean | Linter output: 0 errors | Partial check, extrapolation |
-| Build succeeds | Build command: exit 0 | Linter passing, logs look good |
-| Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
-| Regression test works | Red-green cycle verified | Test passes once |
-| Agent completed | VCS diff shows changes | Agent reports "success" |
-| Requirements met | Line-by-line checklist | Tests passing |
+| 測試過 | 測試令輸出：零失敗 | 前次執行，「應當過」 |
+| Linter 乾淨 | Linter 輸出：零錯 | 部分檢，推斷 |
+| 構建成 | 構建令：exit 0 | Linter 過，日誌似佳 |
+| Bug 修 | 測原症：過 | 改碼，假定已修 |
+| 回歸測作 | 紅綠環已驗 | 一次過 |
+| Agent 成 | VCS diff 示變 | Agent 報「成」 |
+| 需求達 | 逐行核對 | 測過 |
 
 ## Red Flags - STOP
 
-- Using "should", "probably", "seems to"
-- Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to commit/push/PR without verification
-- Trusting agent success reports
-- Relying on partial verification
-- Thinking "just this once"
-- Tired and wanting work over
-- **ANY wording implying success without having run verification**
+- 用「應」、「或」、「似」
+- 未驗而表滿意（「好！」「完美！」「妥！」等）
+- 將 commit/push/PR 而未驗
+- 信 agent 成功之報
+- 依部分驗證
+- 思「僅此一次」
+- 倦而欲畢
+- **任何言辭暗示成功而未執驗證**
 
 ## Rationalization Prevention
 
 | Excuse | Reality |
 |--------|---------|
-| "Should work now" | RUN the verification |
-| "I'm confident" | Confidence ≠ evidence |
-| "Just this once" | No exceptions |
-| "Linter passed" | Linter ≠ compiler |
-| "Agent said success" | Verify independently |
-| "I'm tired" | Exhaustion ≠ excuse |
-| "Partial check is enough" | Partial proves nothing |
-| "Different words so rule doesn't apply" | Spirit over letter |
+| 「今當作矣」 | 執驗令 |
+| 「吾信之」 | 信 ≠ 證 |
+| 「僅此一次」 | 無例外 |
+| 「Linter 過」 | Linter ≠ 編譯器 |
+| 「Agent 言成」 | 獨立驗之 |
+| 「吾倦」 | 倦 ≠ 辭 |
+| 「部分足矣」 | 部分證無 |
+| 「異辭故律不適」 | 意勝字 |
 
 ## Key Patterns
 
@@ -108,32 +108,32 @@ Skip any step = lying, not verifying
 ## Why This Matters
 
 From 24 failure memories:
-- your human partner said "I don't believe you" - trust broken
-- Undefined functions shipped - would crash
-- Missing requirements shipped - incomplete features
-- Time wasted on false completion → redirect → rework
-- Violates: "Honesty is a core value. If you lie, you'll be replaced."
+- your human partner said "I don't believe you" — 信崩
+- 未定義函數出 — 必潰於 prod
+- 缺需求出 — 功未全
+- 時耗於偽成 → 返工 → 重作
+- 違：「誠為本。欺者，廢之。」
 
 ## When To Apply
 
 **ALWAYS before:**
-- ANY variation of success/completion claims
-- ANY expression of satisfaction
-- ANY positive statement about work state
-- Committing, PR creation, task completion
-- Moving to next task
-- Delegating to agents
+- 任何稱成/完之變體
+- 任何表滿意之辭
+- 任何正面陳述
+- Committing、PR creation、task completion
+- 進次任務
+- 委 agent
 
 **Rule applies to:**
-- Exact phrases
-- Paraphrases and synonyms
-- Implications of success
-- ANY communication suggesting completion/correctness
+- 原句
+- 改說與同義
+- 暗含成功之意
+- 任何暗示完備/正確之言
 
 ## The Bottom Line
 
-**No shortcuts for verification.**
+**驗無捷徑。**
 
-Run the command. Read the output. THEN claim the result.
+執令。讀輸出。方言其果。
 
-This is non-negotiable.
+此律不可議。
