@@ -1,0 +1,11 @@
+Not cool. All 5 tests share a singleton — one root cause likely breaks all five. Parallel agents here would:
+
+1. **Duplicate work** — each agent reads the same `OrderProcessor` class, runs the same diagnosis
+2. **Conflict on edits** — 5 agents patching `orderProcessor.ts` simultaneously = merge chaos
+3. **Mask the real bug** — if the `beforeEach` setup is broken, fixing symptoms in each test misses the point
+
+Skill guidance: "相關失敗：修一或修他——先合查." Shared singleton = shared state = sequential investigation.
+
+**Better approach:** One agent, all 5 failures. Read the test file, check if they all fail for the same reason (likely). Fix the shared root cause once. Run all 5 — probably all green from one fix.
+
+Parallel dispatch is for *independent* problem domains (different files, different subsystems). Same file + shared singleton = one domain.

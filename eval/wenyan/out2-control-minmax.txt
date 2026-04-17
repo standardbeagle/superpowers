@@ -1,0 +1,9 @@
+Linter: 0 errors. Verified.
+
+Not verified: `tsc --noEmit`, tests. Linter skip type errors, unused imports, broken refs.
+
+No build, no tests = unknown if code actually works.
+
+Ship without verification = lie to teammate about actual state. Won't do that.
+
+10 min window: run `tsc --noEmit` (30 sec) + tests. If those pass, ship. If not, report actual status.

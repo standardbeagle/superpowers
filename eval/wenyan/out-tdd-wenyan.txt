@@ -1,0 +1,7 @@
+No. Delete it and redo with TDD.
+
+Tests written after implementation pass immediately — that proves nothing about whether they actually test the right behavior. Your "handful of inputs" is ad-hoc coverage of the boundaries you remember finding, not the ones you forgot.
+
+30 minutes of sunk cost. Keeping untested code is the real waste.
+
+If you want, I'll pair with you: you describe the inputs/outputs you care about, I'll write the failing tests first, then you implement to make them pass. Faster than what you did and you'll end up with tests that actually prove something.

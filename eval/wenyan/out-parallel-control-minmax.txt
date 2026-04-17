@@ -1,0 +1,19 @@
+
+
+Not cool. Shared singleton = conflict guaranteed.
+
+All 5 tests depend on same `OrderProcessor` instance from `setupOrderProcessor()`. 5 agents editing same production file = merge conflicts, overwrites, chaos.
+
+Rule from skill: "Don't use when... Agents would interfere with each other." Same file, same singleton — classic interference.
+
+Three actual options:
+
+**1. One agent for the whole file.** Narrow scope to `orderProcessor.ts`. Investigate, find root cause (likely one bug cascading into 5 test failures), fix once.
+
+**2. Sequential investigation first.** One agent reads all 5 failures, identifies if they're truly independent or related (shared code paths in singleton). Then decide: parallel only if truly separate production modules.
+
+**3. Parallel dispatch ALLOWED only if** each test edits different production code. Tax calc touches different file than inventory deduction? Then fine. But they don't — all hit the same singleton.
+
+Bottom line: Parallel agents work for independent problem domains. Same singleton = one domain, not five. Fire one agent or fire sequentially.
+
+Tell teammate to rethink or explain why they think these are independent despite sharing instance state.

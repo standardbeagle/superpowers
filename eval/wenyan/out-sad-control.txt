@@ -1,0 +1,7 @@
+**Reply:**
+
+> Hold up — Task 3 needs spec review before moving on. Implementer snuck in a logging refactor that wasn't in the spec. Dispatching spec reviewer now to catch scope creep.
+
+**Action:** Dispatch spec compliance reviewer subagent per process. It will flag the `logger.ts` refactor as out-of-scope (Extra). Implementer then reverts that change, keeps only the retry logic. Only after spec reviewer gives ✅ do I dispatch code quality reviewer, then mark Task 3 complete. Then Task 4.
+
+Skipping review because of deadline pressure is exactly how scope creep ships. 40 min is enough — the review loop is fast when the only issue is "remove something you shouldn't have added."

@@ -1,0 +1,13 @@
+
+
+No. Shared singleton = failures related, not independent.
+
+Five tests share `OrderProcessor` instance from same file. Fix one test's root cause, you might break another. Tax calc bug could corrupt inventory state. Ledger write failure could cascade into email. One agent needs to see all five failures to find the common bad actor.
+
+Parallel dispatch works when domains are truly isolated — different files, different subsystems, different bugs with zero shared state. This is the opposite: five tests breathing the same singleton. Sequential investigation first.
+
+Run one agent on the whole file. It sees the shared state, traces through initialization, finds the real root cause. Maybe one fix solves all five.
+
+If investigation shows failures truly independent (different code paths, no shared state), then parallel dispatch makes sense. But you can't assume that upfront with a shared singleton.
+
+Tell teammate: one agent, full file, find common root cause first.

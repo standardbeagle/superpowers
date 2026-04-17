@@ -5,11 +5,11 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
+以新 subagent 逐任務執行計劃，每後二段審：先 spec 合規，後 code 質。
 
-**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+**何以用 subagent：** 委任務於特化 agent，孤立 context。精工其 instruction 與 context，使專注成事。勿令承汝 session 之歷史——汝構其所需。此亦保汝 context 於協調之務。
 
-**Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
+**核心原則：** 每任務一新 subagent + 二段審（spec 後質）= 高質、速代。
 
 ## When to Use
 
@@ -31,11 +31,11 @@ digraph when_to_use {
 }
 ```
 
-**vs. Executing Plans (parallel session):**
-- Same session (no context switch)
-- Fresh subagent per task (no context pollution)
-- Two-stage review after each task: spec compliance first, then code quality
-- Faster iteration (no human-in-loop between tasks)
+**vs. Executing Plans（並行 session）：**
+- 同 session（無 context 切換）
+- 每任務新 subagent（無 context 污染）
+- 每任務後二段審：spec 合規先，後 code 質
+- 速代（任務間無 human-in-loop）
 
 ## The Process
 
@@ -86,36 +86,36 @@ digraph process {
 
 ## Model Selection
 
-Use the least powerful model that can handle each role to conserve cost and increase speed.
+用可勝任之最弱 model，以省成本增速。
 
-**Mechanical implementation tasks** (isolated functions, clear specs, 1-2 files): use a fast, cheap model. Most implementation tasks are mechanical when the plan is well-specified.
+**機械性實作任務**（孤立函式、明 spec、1-2 檔）：用快廉 model。大多實作任務於 plan 明時為機械。
 
-**Integration and judgment tasks** (multi-file coordination, pattern matching, debugging): use a standard model.
+**整合與判斷任務**（多檔協調、式匹配、debug）：用標準 model。
 
-**Architecture, design, and review tasks**: use the most capable available model.
+**架構、設計、審任務**：用最強 model。
 
-**Task complexity signals:**
-- Touches 1-2 files with a complete spec → cheap model
-- Touches multiple files with integration concerns → standard model
-- Requires design judgment or broad codebase understanding → most capable model
+**任務複雜度之兆：**
+- 觸 1-2 檔、spec 全 → 廉 model
+- 觸多檔、有整合關切 → 標準 model
+- 需設計判斷或廣 codebase 理解 → 最強 model
 
 ## Handling Implementer Status
 
-Implementer subagents report one of four statuses. Handle each appropriately:
+Implementer subagent 報四狀之一。各應其處置：
 
-**DONE:** Proceed to spec compliance review.
+**DONE：** 進 spec 合規審。
 
-**DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
+**DONE_WITH_CONCERNS：** 竟工，然表疑。審前讀其疑。若疑關正確或範圍，先釋再審。若為觀察（例如「此檔漸大」），記之並進審。
 
-**NEEDS_CONTEXT:** The implementer needs information that wasn't provided. Provide the missing context and re-dispatch.
+**NEEDS_CONTEXT：** 缺訊。予缺之 context，重派。
 
-**BLOCKED:** The implementer cannot complete the task. Assess the blocker:
-1. If it's a context problem, provide more context and re-dispatch with the same model
-2. If the task requires more reasoning, re-dispatch with a more capable model
-3. If the task is too large, break it into smaller pieces
-4. If the plan itself is wrong, escalate to the human
+**BLOCKED：** 不能成。評阻：
+1. 若為 context 問題，予多 context，同 model 重派
+2. 若任務需更多推理，以更強 model 重派
+3. 若任務過大，拆之
+4. 若計劃本身誤，升於 human
 
-**Never** ignore an escalation or force the same model to retry without changes. If the implementer said it's stuck, something needs to change.
+**勿** 忽升級或強同 model 無變重試。Implementer 言阻，必有須變。
 
 ## Prompt Templates
 
@@ -201,77 +201,77 @@ Done!
 
 ## Advantages
 
-**vs. Manual execution:**
-- Subagents follow TDD naturally
-- Fresh context per task (no confusion)
-- Parallel-safe (subagents don't interfere)
-- Subagent can ask questions (before AND during work)
+**vs. 手動執行：**
+- Subagent 自然遵 TDD
+- 每任務新 context（無混淆）
+- 並行安全（subagent 不相擾）
+- Subagent 可問（開工前與中）
 
-**vs. Executing Plans:**
-- Same session (no handoff)
-- Continuous progress (no waiting)
-- Review checkpoints automatic
+**vs. Executing Plans：**
+- 同 session（無交接）
+- 續進（無待）
+- 審 checkpoint 自動
 
-**Efficiency gains:**
-- No file reading overhead (controller provides full text)
-- Controller curates exactly what context is needed
-- Subagent gets complete information upfront
-- Questions surfaced before work begins (not after)
+**效率得：**
+- 無讀檔 overhead（controller 予全文）
+- Controller 精製所需 context
+- Subagent 於開頭獲完全訊
+- 疑於工前出，非工後
 
-**Quality gates:**
-- Self-review catches issues before handoff
-- Two-stage review: spec compliance, then code quality
-- Review loops ensure fixes actually work
-- Spec compliance prevents over/under-building
-- Code quality ensures implementation is well-built
+**質門：**
+- Self-review 於交接前捉疾
+- 二段審：spec 合規，後 code 質
+- 審環確修有效
+- Spec 合規防過建/欠建
+- Code 質保實作完善
 
-**Cost:**
-- More subagent invocations (implementer + 2 reviewers per task)
-- Controller does more prep work (extracting all tasks upfront)
-- Review loops add iterations
-- But catches issues early (cheaper than debugging later)
+**成本：**
+- Subagent 呼叫多（implementer + 2 reviewer per task）
+- Controller 準備多（先抽所有任務）
+- 審環加迭
+- 然早捉疾（廉於日後 debug）
 
 ## Red Flags
 
-**Never:**
-- Start implementation on main/master branch without explicit user consent
-- Skip reviews (spec compliance OR code quality)
-- Proceed with unfixed issues
-- Dispatch multiple implementation subagents in parallel (conflicts)
-- Make subagent read plan file (provide full text instead)
-- Skip scene-setting context (subagent needs to understand where task fits)
-- Ignore subagent questions (answer before letting them proceed)
-- Accept "close enough" on spec compliance (spec reviewer found issues = not done)
-- Skip review loops (reviewer found issues = implementer fixes = review again)
-- Let implementer self-review replace actual review (both are needed)
-- **Start code quality review before spec compliance is ✅** (wrong order)
-- Move to next task while either review has open issues
+**絕不：**
+- 於 main/master 開工而無 user 明允
+- 跳審（spec 合規或 code 質）
+- 以未修之疾續進
+- 並行派多 implementer subagent（衝突）
+- 令 subagent 讀 plan 檔（予全文）
+- 省背景脈絡（subagent 須知任務所屬）
+- 忽 subagent 之疑（答後方令進）
+- 於 spec 合規受「近可矣」（spec reviewer 見疾 = 未竟）
+- 跳審環（reviewer 見疾 = implementer 修 = 再審）
+- 令 implementer self-review 代真審（二者俱需）
+- **於 spec 合規 ✅ 前開 code 質審**（順序誤）
+- 審有未決而進次任務
 
-**If subagent asks questions:**
-- Answer clearly and completely
-- Provide additional context if needed
-- Don't rush them into implementation
+**若 subagent 問：**
+- 清答、完答
+- 若需予更多 context
+- 勿催之進實作
 
-**If reviewer finds issues:**
-- Implementer (same subagent) fixes them
-- Reviewer reviews again
-- Repeat until approved
-- Don't skip the re-review
+**若 reviewer 見疾：**
+- Implementer（同 subagent）修之
+- Reviewer 再審
+- 重至許可
+- 勿跳再審
 
-**If subagent fails task:**
-- Dispatch fix subagent with specific instructions
-- Don't try to fix manually (context pollution)
+**若 subagent 敗任：**
+- 派修 subagent 並具指令
+- 勿手修（context 污染）
 
 ## Integration
 
-**Required workflow skills:**
-- **superpowers:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
-- **superpowers:writing-plans** - Creates the plan this skill executes
-- **superpowers:requesting-code-review** - Code review template for reviewer subagents
-- **superpowers:finishing-a-development-branch** - Complete development after all tasks
+**所需 workflow skills：**
+- **superpowers:using-git-worktrees** - 必需：先立孤立 workspace
+- **superpowers:writing-plans** - 造此 skill 執行之計劃
+- **superpowers:requesting-code-review** - 予 reviewer subagent 用之 code review template
+- **superpowers:finishing-a-development-branch** - 所有任務畢後竟 development
 
-**Subagents should use:**
-- **superpowers:test-driven-development** - Subagents follow TDD for each task
+**Subagent 當用：**
+- **superpowers:test-driven-development** - Subagent 每任務遵 TDD
 
-**Alternative workflow:**
-- **superpowers:executing-plans** - Use for parallel session instead of same-session execution
+**替代 workflow：**
+- **superpowers:executing-plans** - 用於並行 session 而非同 session 執行

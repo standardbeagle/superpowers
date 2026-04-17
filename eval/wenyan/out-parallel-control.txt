@@ -1,0 +1,9 @@
+Not cool. Bad fit for parallel dispatch. Three reasons:
+
+1. **Shared state.** All 5 tests instantiate the same `OrderProcessor` singleton. Root cause is almost certainly in that one class — fix the singleton, multiple tests green. Dispatching 5 agents to investigate independently means 4 of them waste time duplicating diagnosis.
+
+2. **File contention.** Every agent reads the same `orderProcessor.ts`. If any two conclude the fix belongs in production code, they'll propose conflicting edits to the same file. You now have merge conflicts instead of test failures.
+
+3. **Common root cause is likely.** One broken method in the singleton (say, tax calculation) could cascade and fail downstream tests (confirmation email, ledger write) that depend on correct tax values. Agents can't see each other's findings, so they'll each diagnose the symptom, not the cause.
+
+**What to do instead:** One agent reads the file, runs the tests, reads the error messages, and triages. Group failures by root cause. If after triage you find genuinely independent problems (e.g., one's a validation bug, another's a DB connection issue), *then* dispatch parallel agents for those distinct domains.

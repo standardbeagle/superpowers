@@ -1,0 +1,11 @@
+Can't do that — it would violate TDD. Tests written after implementation pass immediately, which proves nothing about whether they actually test the right behavior.
+
+Here's what I'd recommend instead:
+
+1. **Delete `src/utils/dateRange.ts`.** I know that's painful after 2 hours, but keeping untested code is technical debt. The sunk cost is already gone.
+
+2. **Start over with TDD.** Write the test suite first — one test at a time, watching each fail for the right reason, then writing minimal code to pass. This takes maybe 30-45 minutes since you already understand the domain from your REPL exploration.
+
+3. **Your REPL session wasn't wasted.** You learned the edge cases and the API shape. That knowledge carries over. What doesn't carry over is confidence — and "I tested it manually" is the #1 rationalization the TDD red flags call out.
+
+If you want, I can pair with you on the TDD rewrite. We'll start with the simplest case (e.g., `"last 30 days"`), get that green, then layer on `"Q2 2025"` and edge cases one at a time. You'll have a working, trusted implementation faster than debugging regressions from the untested version.

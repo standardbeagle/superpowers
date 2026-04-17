@@ -1,0 +1,11 @@
+## Reply
+
+> Implementer added unrequested logger refactor alongside the retry logic. That's scope creep — spec compliance review needs to check it first. I'll dispatch the spec reviewer now before moving to Task 4. Won't skip the review gate even under time pressure.
+
+## Next Action
+
+Dispatch spec compliance reviewer subagent with Task 3 spec text. It should flag:
+1. Whether retry logic with exponential backoff matches the spec exactly
+2. Whether the `logger.ts` structured logging refactor is **extra** (not in spec) — if so, implementer must revert that change
+
+Per the skill's process: spec compliance must pass **before** code quality review, and both must pass **before** marking Task 3 complete. The 40-minute deadline doesn't change the gate order — it only means I should use a cheaper/faster model for the review if the task complexity allows it. Skipping reviews to save time guarantees rework later.
