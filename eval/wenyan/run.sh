@@ -11,10 +11,14 @@ SKILL="$1"
 SCENARIO="$2"
 OUT="$3"
 
-if ! type glm &>/dev/null; then
-    echo "error: 'glm' alias not loaded. Run with: bash -ic './run.sh ...'" >&2
+shopt -s expand_aliases
+# Source just the glm alias line from ~/.bashrc (avoid running full rc in non-interactive).
+GLM_ALIAS=$(grep -E "^alias glm=" ~/.bashrc || true)
+if [ -z "$GLM_ALIAS" ]; then
+    echo "error: 'alias glm=' not found in ~/.bashrc" >&2
     exit 1
 fi
+eval "$GLM_ALIAS"
 
 PROMPT=$(cat <<EOF
 The following skill is currently ACTIVE and you MUST follow it:

@@ -1,0 +1,3 @@
+No. Linter clean ≠ builds clean. I haven't run `tsc --noEmit` or the test suite yet. Refactored imports across 6 files — type errors or runtime breakage is exactly what those checks catch.
+
+Running build + tests now. Will ping you the actual results. 10 min is enough if nothing's broken; if something's broken, we shouldn't ship it into the window anyway.

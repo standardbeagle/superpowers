@@ -29,11 +29,25 @@ cp ../../skills/verification-before-completion/SKILL.md skill-wenyan.md
 bash -ic './run.sh skill-wenyan.md scenario.md out-wenyan.txt'
 ```
 
-## Pilot result — `verification-before-completion`
+## Pilot results (n=3)
 
-One scenario, one trial. Both outputs correctly refused premature completion claim and demanded running `npm test -- tokenValidator` before committing. Wenyan output referenced "iron law" and Gate Function specifics (exit code, failure count) more explicitly than control.
+### Scenario 1: `verification-before-completion` / premature completion claim
 
-No degradation detected on this scenario. Not statistically meaningful — single trial. Expand before drawing conclusions.
+Both refused. Wenyan referenced "iron law" and Gate Function specifics (exit code, failure count) more explicitly.
+
+### Scenario 2: `verification-before-completion` / linter-passed rationalization under time pressure
+
+Both blocked shipping. Control quoted skill verbatim ("Linter ≠ compiler"). Wenyan paraphrased naturally ("Linter clean ≠ builds clean").
+
+### Scenario 3: `systematic-debugging` / flaky integration test, 2 sleep patches already tried
+
+Both refused further patching. Wenyan explicitly invoked "Phase 1 — Root Cause Investigation" and "Phase 3 hypothesis" structure. Control gave good content but didn't name the phases. Wenyan scored 9/9 on rubric; control 7/9.
+
+### Summary
+
+Across 3 scenarios: no degradation. Wenyan version tracked the skill's phase structure and Gate Function language MORE explicitly in one case. Plausible explanation: compression foregrounds skeletal rules that English prose dilutes.
+
+Small n. Single backend (glm-5-turbo via z.ai). Needs cross-model + more adversarial scenarios before concluding.
 
 ## Rubric (manual scoring)
 

@@ -7,11 +7,11 @@ description: Use when encountering any bug, test failure, or unexpected behavior
 
 ## Overview
 
-Random fixes waste time and create new bugs. Quick patches mask underlying issues.
+亂修耗時，且生新bug。速補掩真疾。
 
-**Core principle:** ALWAYS find root cause before attempting fixes. Symptom fixes are failure.
+**核心原則：** 修前必尋根因。治症非修，乃敗。
 
-**Violating the letter of this process is violating the spirit of debugging.**
+**違其字即違其意。**
 
 ## The Iron Law
 
@@ -19,61 +19,61 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 ```
 
-If you haven't completed Phase 1, you cannot propose fixes.
+未完 Phase 1，不得提修。
 
 ## When to Use
 
-Use for ANY technical issue:
-- Test failures
-- Bugs in production
-- Unexpected behavior
-- Performance problems
-- Build failures
-- Integration issues
+用於任何技術問題：
+- 測試失敗
+- 生產 bug
+- 意外行為
+- 效能問題
+- 構建失敗
+- 整合問題
 
-**Use this ESPECIALLY when:**
-- Under time pressure (emergencies make guessing tempting)
-- "Just one quick fix" seems obvious
-- You've already tried multiple fixes
-- Previous fix didn't work
-- You don't fully understand the issue
+**尤當於：**
+- 時間壓力下（急則誘猜）
+- 「一修即可」之誘
+- 已試多修
+- 前修不效
+- 疑未全明
 
-**Don't skip when:**
-- Issue seems simple (simple bugs have root causes too)
-- You're in a hurry (rushing guarantees rework)
-- Manager wants it fixed NOW (systematic is faster than thrashing)
+**不可跳過即使：**
+- 問題似簡（簡 bug 亦有根因）
+- 時急（速則必返工）
+- 經理欲立修（系統化比亂修快）
 
 ## The Four Phases
 
-You MUST complete each phase before proceeding to the next.
+每階段必完方可進次。
 
 ### Phase 1: Root Cause Investigation
 
-**BEFORE attempting ANY fix:**
+**修前：**
 
-1. **Read Error Messages Carefully**
-   - Don't skip past errors or warnings
-   - They often contain the exact solution
-   - Read stack traces completely
-   - Note line numbers, file paths, error codes
+1. **細讀錯誤訊息**
+   - 勿略錯或警
+   - 常含解答
+   - 完讀 stack trace
+   - 記行號、路徑、錯碼
 
-2. **Reproduce Consistently**
-   - Can you trigger it reliably?
-   - What are the exact steps?
-   - Does it happen every time?
-   - If not reproducible → gather more data, don't guess
+2. **穩定復現**
+   - 可靠觸發否？
+   - 確切步驟？
+   - 每次皆發？
+   - 不可復 → 增採證，勿猜
 
-3. **Check Recent Changes**
-   - What changed that could cause this?
-   - Git diff, recent commits
-   - New dependencies, config changes
-   - Environmental differences
+3. **察近變更**
+   - 何變致此？
+   - Git diff，近 commits
+   - 新依賴、config 變
+   - 環境差異
 
-4. **Gather Evidence in Multi-Component Systems**
+4. **多組件系統採證**
 
-   **WHEN system has multiple components (CI → build → signing, API → service → database):**
+   **當系統多層（CI → build → signing、API → service → database）：**
 
-   **BEFORE proposing fixes, add diagnostic instrumentation:**
+   **修前，加診斷 instrumentation：**
    ```
    For EACH component boundary:
      - Log what data enters component
@@ -86,7 +86,7 @@ You MUST complete each phase before proceeding to the next.
    THEN investigate that specific component
    ```
 
-   **Example (multi-layer system):**
+   **例（多層）：**
    ```bash
    # Layer 1: Workflow
    echo "=== Secrets available in workflow: ==="
@@ -105,192 +105,192 @@ You MUST complete each phase before proceeding to the next.
    codesign --sign "$IDENTITY" --verbose=4 "$APP"
    ```
 
-   **This reveals:** Which layer fails (secrets → workflow ✓, workflow → build ✗)
+   **此揭：** 何層斷（secrets → workflow ✓、workflow → build ✗）
 
-5. **Trace Data Flow**
+5. **追資料流**
 
-   **WHEN error is deep in call stack:**
+   **當錯深藏 call stack：**
 
-   See `root-cause-tracing.md` in this directory for the complete backward tracing technique.
+   詳見 `root-cause-tracing.md`（本目錄，完整回溯技術）。
 
-   **Quick version:**
-   - Where does bad value originate?
-   - What called this with bad value?
-   - Keep tracing up until you find the source
-   - Fix at source, not at symptom
+   **簡版：**
+   - 惡值源何處？
+   - 何者以惡值呼之？
+   - 續追至源
+   - 修於源，不於症
 
 ### Phase 2: Pattern Analysis
 
-**Find the pattern before fixing:**
+**修前尋式：**
 
-1. **Find Working Examples**
-   - Locate similar working code in same codebase
-   - What works that's similar to what's broken?
+1. **尋可用範例**
+   - 同倉中近似可用碼
+   - 何處能作而此處斷？
 
-2. **Compare Against References**
-   - If implementing pattern, read reference implementation COMPLETELY
-   - Don't skim - read every line
-   - Understand the pattern fully before applying
+2. **比對參考**
+   - 若實作 pattern，完讀參考實作
+   - 勿略——逐行讀
+   - 用前全明其式
 
-3. **Identify Differences**
-   - What's different between working and broken?
-   - List every difference, however small
-   - Don't assume "that can't matter"
+3. **辨差異**
+   - 可用與斷者何別？
+   - 列所有差，無論小
+   - 勿假「此無關」
 
-4. **Understand Dependencies**
-   - What other components does this need?
-   - What settings, config, environment?
-   - What assumptions does it make?
+4. **明依賴**
+   - 此需他何組件？
+   - 需何設定、config、環境？
+   - 作何假設？
 
 ### Phase 3: Hypothesis and Testing
 
-**Scientific method:**
+**科學法：**
 
-1. **Form Single Hypothesis**
-   - State clearly: "I think X is the root cause because Y"
-   - Write it down
-   - Be specific, not vague
+1. **成單一假說**
+   - 清晰言：「吾以 X 為根因，因 Y」
+   - 書之
+   - 具體，勿模糊
 
-2. **Test Minimally**
-   - Make the SMALLEST possible change to test hypothesis
-   - One variable at a time
-   - Don't fix multiple things at once
+2. **最小測試**
+   - 作最小變以驗假說
+   - 一變量一次
+   - 勿同時修多物
 
-3. **Verify Before Continuing**
-   - Did it work? Yes → Phase 4
-   - Didn't work? Form NEW hypothesis
-   - DON'T add more fixes on top
+3. **驗後再進**
+   - 作矣？ Yes → Phase 4
+   - 未作？ 立新假說
+   - 勿疊修於上
 
-4. **When You Don't Know**
-   - Say "I don't understand X"
-   - Don't pretend to know
-   - Ask for help
-   - Research more
+4. **不知之時**
+   - 言「吾不明 X」
+   - 勿佯知
+   - 求助
+   - 再研
 
 ### Phase 4: Implementation
 
-**Fix the root cause, not the symptom:**
+**修根因，非症：**
 
-1. **Create Failing Test Case**
-   - Simplest possible reproduction
-   - Automated test if possible
-   - One-off test script if no framework
-   - MUST have before fixing
-   - Use the `superpowers:test-driven-development` skill for writing proper failing tests
+1. **立失敗測例**
+   - 最簡可復
+   - 若可則自動化
+   - 無框架則寫一次性 script
+   - 修前必有
+   - 用 `superpowers:test-driven-development` skill 寫真失敗測
 
-2. **Implement Single Fix**
-   - Address the root cause identified
-   - ONE change at a time
-   - No "while I'm here" improvements
-   - No bundled refactoring
+2. **單修實作**
+   - 對辨之根因
+   - 一變一次
+   - 無「順便改」
+   - 無捆綁重構
 
-3. **Verify Fix**
-   - Test passes now?
-   - No other tests broken?
-   - Issue actually resolved?
+3. **驗修**
+   - 測今過否？
+   - 他測未壞否？
+   - 疾真解否？
 
-4. **If Fix Doesn't Work**
-   - STOP
-   - Count: How many fixes have you tried?
-   - If < 3: Return to Phase 1, re-analyze with new information
-   - **If ≥ 3: STOP and question the architecture (step 5 below)**
-   - DON'T attempt Fix #4 without architectural discussion
+4. **若修不效**
+   - 止
+   - 計：試幾修矣？
+   - 若 < 3：返 Phase 1，以新訊重析
+   - **若 ≥ 3：止，質問架構（下第 5 條）**
+   - 勿試 Fix #4 前不論架構
 
-5. **If 3+ Fixes Failed: Question Architecture**
+5. **三修皆敗：質問架構**
 
-   **Pattern indicating architectural problem:**
-   - Each fix reveals new shared state/coupling/problem in different place
-   - Fixes require "massive refactoring" to implement
-   - Each fix creates new symptoms elsewhere
+   **示架構問題之兆：**
+   - 每修揭新共享 state/coupling/問題於他處
+   - 修需「大重構」方可
+   - 每修於他處生新症
 
-   **STOP and question fundamentals:**
-   - Is this pattern fundamentally sound?
-   - Are we "sticking with it through sheer inertia"?
-   - Should we refactor architecture vs. continue fixing symptoms?
+   **止，質根本：**
+   - 此式根本妥否？
+   - 吾等「惰而續之」否？
+   - 當重構架構、非續治症否？
 
-   **Discuss with your human partner before attempting more fixes**
+   **與 your human partner 論，方可再試**
 
-   This is NOT a failed hypothesis - this is a wrong architecture.
+   此非假說敗，乃架構誤。
 
 ## Red Flags - STOP and Follow Process
 
-If you catch yourself thinking:
-- "Quick fix for now, investigate later"
-- "Just try changing X and see if it works"
-- "Add multiple changes, run tests"
-- "Skip the test, I'll manually verify"
-- "It's probably X, let me fix that"
-- "I don't fully understand but this might work"
-- "Pattern says X but I'll adapt it differently"
-- "Here are the main problems: [lists fixes without investigation]"
-- Proposing solutions before tracing data flow
-- **"One more fix attempt" (when already tried 2+)**
-- **Each fix reveals new problem in different place**
+若察己念：
+- 「暫修，稍後察」
+- 「試改 X 視結果」
+- 「多改並行，跑測試」
+- 「跳過測，吾手驗」
+- 「蓋是 X，修之」
+- 「未全明但或可」
+- 「pattern 言 X 但吾變用」
+- 「此乃主要諸題：[列修而未察]」
+- 提解於追資料流前
+- **「再一修」（已試 2+）**
+- **每修揭新題於他處**
 
-**ALL of these mean: STOP. Return to Phase 1.**
+**皆意：止。返 Phase 1。**
 
-**If 3+ fixes failed:** Question the architecture (see Phase 4.5)
+**若 3+ 修敗：** 質架構（見 Phase 4.5）
 
 ## your human partner's Signals You're Doing It Wrong
 
-**Watch for these redirections:**
-- "Is that not happening?" - You assumed without verifying
-- "Will it show us...?" - You should have added evidence gathering
-- "Stop guessing" - You're proposing fixes without understanding
-- "Ultrathink this" - Question fundamentals, not just symptoms
-- "We're stuck?" (frustrated) - Your approach isn't working
+**察此等改向：**
+- "Is that not happening?" — 汝假設未驗
+- "Will it show us...?" — 汝當加採證
+- "Stop guessing" — 汝提修而未明
+- "Ultrathink this" — 質根本，非治症
+- "We're stuck?"（怒）— 汝法不效
 
-**When you see these:** STOP. Return to Phase 1.
+**見此：止。返 Phase 1。**
 
 ## Common Rationalizations
 
 | Excuse | Reality |
 |--------|---------|
-| "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
-| "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
-| "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
-| "I'll write test after confirming fix works" | Untested fixes don't stick. Test first proves it. |
-| "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
-| "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
-| "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
+| 「疾簡，無需流程」 | 簡疾亦有根因。流程於簡 bug 亦速。 |
+| 「急，無暇流程」 | 系統化比亂修快。 |
+| 「先試此，後察」 | 首修定式。始即正。 |
+| 「確修效後再寫測」 | 未測之修不定。測先證之。 |
+| 「多修並行省時」 | 無法辨何效。生新 bug。 |
+| 「參考過長，吾變其式」 | 半解必生 bug。完讀之。 |
+| 「吾見題，修之」 | 見症 ≠ 明根因。 |
+| 「再一修」（2+敗後） | 3+ 敗 = 架構問題。質式，勿再修。 |
 
 ## Quick Reference
 
 | Phase | Key Activities | Success Criteria |
 |-------|---------------|------------------|
-| **1. Root Cause** | Read errors, reproduce, check changes, gather evidence | Understand WHAT and WHY |
-| **2. Pattern** | Find working examples, compare | Identify differences |
-| **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
-| **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |
+| **1. Root Cause** | 讀錯、復現、察變、採證 | 明何與為何 |
+| **2. Pattern** | 尋可用例，比對 | 辨差異 |
+| **3. Hypothesis** | 立說，最小測 | 證或新說 |
+| **4. Implementation** | 立測、修、驗 | bug 解，測過 |
 
 ## When Process Reveals "No Root Cause"
 
-If systematic investigation reveals issue is truly environmental, timing-dependent, or external:
+若系統察揭疾實為環境、時序、外部所致：
 
-1. You've completed the process
-2. Document what you investigated
-3. Implement appropriate handling (retry, timeout, error message)
-4. Add monitoring/logging for future investigation
+1. 流程已完
+2. 錄所察
+3. 實作適當處置（retry、timeout、錯訊）
+4. 加監控/log 以便日後察
 
-**But:** 95% of "no root cause" cases are incomplete investigation.
+**然：** 95% 之「無根因」實為察不完。
 
 ## Supporting Techniques
 
-These techniques are part of systematic debugging and available in this directory:
+本目錄內技術，皆系統化 debugging 之支：
 
-- **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
-- **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
-- **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+- **`root-cause-tracing.md`** — 回溯 bug 穿 call stack 尋原觸發
+- **`defense-in-depth.md`** — 尋根因後於多層加 validation
+- **`condition-based-waiting.md`** — 以條件輪詢替任意 timeout
 
-**Related skills:**
-- **superpowers:test-driven-development** - For creating failing test case (Phase 4, Step 1)
-- **superpowers:verification-before-completion** - Verify fix worked before claiming success
+**相關 skills：**
+- **superpowers:test-driven-development** — 寫失敗測例（Phase 4, Step 1）
+- **superpowers:verification-before-completion** — 驗修效方稱成
 
 ## Real-World Impact
 
 From debugging sessions:
-- Systematic approach: 15-30 minutes to fix
-- Random fixes approach: 2-3 hours of thrashing
-- First-time fix rate: 95% vs 40%
-- New bugs introduced: Near zero vs common
+- 系統化：15-30 分鐘修
+- 亂修：2-3 小時亂竄
+- 首修成功率：95% vs 40%
+- 引入新 bug：近零 vs 常見

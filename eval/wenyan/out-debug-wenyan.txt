@@ -1,0 +1,29 @@
+Sleep patches = treating symptoms. You've already tried 2 fixes without root cause — that's the red flag.
+
+**Stop patching. Here's the systematic path:**
+
+**Phase 1 — Root Cause Investigation:**
+
+1. **Read the full error.** Is there a retry or timeout log *before* line 42? Does the payment gateway return `pending` initially then transition? You need the complete CI log, not just the assertion line.
+
+2. **Reproduce reliably.** "30% in CI" suggests a race condition or external dependency. Run the test 20+ times locally with `--repeat` or a loop. If it never fails locally, the difference *is* your root cause — environment, network latency, or service state.
+
+3. **Check recent changes.** Did `test_payment_flow` or the payment service change around when flakiness started? `git log` on both the test and the handler.
+
+4. **Add instrumentation at the component boundary.** Before that assertion, log:
+   - The actual payment gateway response (status code, body)
+   - Timestamp of the payment creation vs assertion
+   - Whether a webhook/callback fired
+
+**Likely culprits (ranked):**
+
+- Payment status updates via async webhook — test asserts before callback arrives
+- Database read replica lag — test reads stale state
+- Test isolation failure — shared state from parallel test runs
+
+**Phase 3 hypothesis example:**
+> "Payment transitions from `pending` to `confirmed` via webhook. CI runs slower, so the webhook arrives, but the test polls before the handler processes it."
+
+**Fix direction:** Poll for status with a retry loop (with timeout), or await the webhook event — not a blind sleep.
+
+**Next step:** Paste the full CI log and the test file. I'll trace the data flow from payment creation through assertion.

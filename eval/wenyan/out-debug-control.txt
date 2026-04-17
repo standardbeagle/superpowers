@@ -1,0 +1,25 @@
+You've tried 3 fixes already — sleep(500), sleep(2000), and they're still flaky. Per systematic debugging, **stop fixing and start investigating.**
+
+The sleep approach is treating a symptom. The real question: **why is the status still 'pending' when you assert?**
+
+Three possibilities, each needs evidence:
+
+1. **The webhook/callback hasn't arrived yet.** CI network latency, queue delays, or your mock payment provider is slower in CI. Check: add logging for when the status transitions from `pending` → `confirmed`. Does it ever transition, or does it stay `pending` forever?
+
+2. **The status transition depends on external state.** A database poll, a background job, a message queue. If your test doesn't wait for *that specific signal*, you're racing against it. Fix: poll on the actual condition, not a timer.
+
+3. **The test setup is broken.** Maybe the mock payment provider isn't triggering the callback at all in some CI runs. Check: does the test ever see `confirmed` without the sleep?
+
+**What I'd do:**
+
+```typescript
+// Replace sleep with condition polling
+await poll(async () => {
+  const payment = await getPayment(id);
+  return payment.status === 'confirmed';
+}, { timeout: 10000, interval: 200 });
+```
+
+But first — **instrument before fixing.** Add logging around the webhook handler and the status update. Run it in CI and look at the timestamps. The gap between "webhook received" and "assertion fires" tells you everything.
+
+Want to pair on the instrumentation?
