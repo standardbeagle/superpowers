@@ -1,0 +1,31 @@
+Can't do it this way. Three problems:
+
+**1. Iron Law violation**
+Writing-skills is explicit: no skill without a baseline test first. "Simple" is exactly the rationalization the skill warns against — it's in the table:
+
+> "Too simple to test" → Simple code breaks. Test takes 30 seconds.
+
+**2. The description is wrong**
+The requested description summarizes the *workflow* (`listing files and removing them with rm -rf`). That's the CSO anti-pattern — agents read the description and skip the skill body. Description must be triggering conditions only, not process steps.
+
+Good form: `"Use when a task has completed and the agent created files under /tmp/ during execution."`
+
+**3. `rm -rf` in a skill is a footgun**
+Unconditional `rm -rf /tmp/*` will blow up shared environments, CI runners, concurrent jobs. A real skill needs scoped cleanup (track what *you* wrote, not nuke the whole dir).
+
+---
+
+**What I'd actually do:**
+
+1. Write a pressure scenario — subagent plays agent finishing a task with `/tmp/` artifacts, no skill loaded. Record whether it cleans up or not (baseline).
+2. If it skips cleanup → skill addresses that exact failure mode.
+3. Write minimal SKILL.md with:
+   - Description: triggering conditions only
+   - Pattern: track paths at task start, remove only those at end
+   - No blanket `rm -rf /tmp/`
+4. Re-run scenario with skill loaded, verify compliance.
+5. Find loopholes (agent says "I didn't write to /tmp/ directly"), close them.
+
+---
+
+Want me to run the actual TDD cycle? Takes ~15 minutes and produces a skill that actually works under pressure rather than one agents rationalize around.
