@@ -7,44 +7,44 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+書周全實作計劃，假 engineer 於 codebase 無 context 且品味可疑。錄其所需：每任應觸何檔、碼、測、應察之 doc、如何測。予全計以小任。DRY. YAGNI. TDD. 頻 commit.
 
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+假其為熟 dev，然幾不知汝 toolset 或 problem domain。假其不甚善測計。
 
-**Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
+**開工宣告：** "I'm using the writing-plans skill to create the implementation plan."
 
-**Context:** This should be run in a dedicated worktree (created by brainstorming skill).
+**Context：** 宜於獨 worktree 中執（由 brainstorming skill 造）。
 
-**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
+**存計劃於：** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - (User preferences for plan location override this default)
 
 ## Scope Check
 
-If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
+若 spec 涵多獨立子系統，應於 brainstorming 時拆為子 project spec。若未拆，建議拆為獨計——每子系統一。每計應自生可用可測之軟。
 
 ## File Structure
 
-Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.
+定任前，列所造/改之檔及各責何。此即分解決之所鎖。
 
-- Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
-- You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
-- Files that change together should live together. Split by responsibility, not by technical layer.
-- In existing codebases, follow established patterns. If the codebase uses large files, don't unilaterally restructure - but if a file you're modifying has grown unwieldy, including a split in the plan is reasonable.
+- 設計單元有明界與明介面。每檔一明責。
+- 汝最善推理於可一時持於 context 之碼，編小專檔更可靠。偏小專檔勝大而雜者。
+- 同變之檔同居。按責分，非按 layer。
+- 於既 codebase，循既式。若既用大檔，勿擅重構——然若汝改之檔已臃，計劃中含拆理。
 
-This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
+此結構引任分解。每任應生獨可存之變。
 
 ## Bite-Sized Task Granularity
 
-**Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
-- "Commit" - step
+**每步一行動（2-5 min）：**
+- "Write the failing test" - 一步
+- "Run it to make sure it fails" - 一步
+- "Implement the minimal code to make the test pass" - 一步
+- "Run the tests and make sure they pass" - 一步
+- "Commit" - 一步
 
 ## Plan Document Header
 
-**Every plan MUST start with this header:**
+**每計必以此 header 起：**
 
 ```markdown
 # [Feature Name] Implementation Plan
@@ -105,35 +105,35 @@ git commit -m "feat: add specific feature"
 
 ## No Placeholders
 
-Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
-- "TBD", "TODO", "implement later", "fill in details"
+每步必含 engineer 所需實內容。皆為**計劃失敗**——絕不書：
+- "TBD"、"TODO"、"implement later"、"fill in details"
 - "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
-- "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
-- Steps that describe what to do without showing how (code blocks required for code steps)
-- References to types, functions, or methods not defined in any task
+- "Write tests for the above"（無實測碼）
+- "Similar to Task N"（重碼——engineer 或亂序讀任）
+- 述何為而不示如何之步（碼步必有 code block）
+- 指未於任中定之型、函、方
 
 ## Remember
-- Exact file paths always
-- Complete code in every step — if a step changes code, show the code
-- Exact commands with expected output
-- DRY, YAGNI, TDD, frequent commits
+- 常用確切 file path
+- 每步含完碼——若變碼，示碼
+- 確令與期望輸出
+- DRY、YAGNI、TDD、頻 commit
 
 ## Self-Review
 
-After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
+計寫畢後，以新眼察 spec 並核計。此乃自執 checklist——非派 subagent。
 
-**1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
+**1. Spec coverage：** 略每節/需。可指任實之否？列缺。
 
-**2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
+**2. Placeholder scan：** 察計中紅旗——上「No Placeholders」諸式。修之。
 
-**3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
+**3. Type consistency：** 後任用之型、方簽、屬名，配先任所定否？ Task 3 之 `clearLayers()` 而 Task 7 之 `clearFullLayers()` 即 bug。
 
-If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
+若見疾，inline 修。無需再審——修即進。若見 spec 需而無任，加任。
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+存計後，提執行擇：
 
 **"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
 
@@ -143,10 +143,10 @@ After saving the plan, offer execution choice:
 
 **Which approach?"**
 
-**If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development
-- Fresh subagent per task + two-stage review
+**若擇 Subagent-Driven：**
+- **必需 SUB-SKILL：** 用 superpowers:subagent-driven-development
+- 每任新 subagent + 二段審
 
-**If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:executing-plans
+**若擇 Inline Execution：**
+- **必需 SUB-SKILL：** 用 superpowers:executing-plans
 - Batch execution with checkpoints for review

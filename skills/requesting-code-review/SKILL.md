@@ -5,46 +5,46 @@ description: Use when completing tasks, implementing major features, or before m
 
 # Requesting Code Review
 
-Dispatch superpowers:code-reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history. This keeps the reviewer focused on the work product, not your thought process, and preserves your own context for continued work.
+派 superpowers:code-reviewer subagent 以捕疾於級聯前。Reviewer 獲精工之評估 context——勿予汝 session 歷史。此使 reviewer 專注工成品，非汝思路，且保汝 context 以續工。
 
-**Core principle:** Review early, review often.
+**核心原則：** 早審，常審。
 
 ## When to Request Review
 
-**Mandatory:**
-- After each task in subagent-driven development
-- After completing major feature
-- Before merge to main
+**必需：**
+- subagent-driven development 每任務後
+- 大功完後
+- Merge 入 main 前
 
-**Optional but valuable:**
-- When stuck (fresh perspective)
-- Before refactoring (baseline check)
-- After fixing complex bug
+**可選而有值：**
+- 困時（新視角）
+- 重構前（baseline）
+- 修複雜 bug 後
 
 ## How to Request
 
-**1. Get git SHAs:**
+**1. 取 git SHAs：**
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
-**2. Dispatch code-reviewer subagent:**
+**2. 派 code-reviewer subagent：**
 
-Use Task tool with superpowers:code-reviewer type, fill template at `code-reviewer.md`
+用 Task tool 並 superpowers:code-reviewer type，填 `code-reviewer.md` template
 
-**Placeholders:**
-- `{WHAT_WAS_IMPLEMENTED}` - What you just built
-- `{PLAN_OR_REQUIREMENTS}` - What it should do
-- `{BASE_SHA}` - Starting commit
-- `{HEAD_SHA}` - Ending commit
-- `{DESCRIPTION}` - Brief summary
+**Placeholders：**
+- `{WHAT_WAS_IMPLEMENTED}` - 所建
+- `{PLAN_OR_REQUIREMENTS}` - 應為
+- `{BASE_SHA}` - 起 commit
+- `{HEAD_SHA}` - 終 commit
+- `{DESCRIPTION}` - 簡摘
 
-**3. Act on feedback:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
-- Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
+**3. 依饋行：**
+- Critical 立修
+- Important 續前修
+- Minor 記待後
+- Reviewer 誤則駁（附理）
 
 ## Example
 
@@ -76,30 +76,30 @@ You: [Fix progress indicators]
 
 ## Integration with Workflows
 
-**Subagent-Driven Development:**
-- Review after EACH task
-- Catch issues before they compound
-- Fix before moving to next task
+**Subagent-Driven Development：**
+- 每任務後審
+- 於疾疊前捕
+- 進次任前修
 
-**Executing Plans:**
-- Review after each batch (3 tasks)
-- Get feedback, apply, continue
+**Executing Plans：**
+- 每 batch（3 任）後審
+- 取饋、應之、續
 
-**Ad-Hoc Development:**
-- Review before merge
-- Review when stuck
+**Ad-Hoc Development：**
+- Merge 前審
+- 困時審
 
 ## Red Flags
 
-**Never:**
-- Skip review because "it's simple"
-- Ignore Critical issues
-- Proceed with unfixed Important issues
-- Argue with valid technical feedback
+**絕不：**
+- 因「簡」而跳審
+- 忽 Critical
+- Important 未修而續
+- 與有效技術饋爭
 
-**If reviewer wrong:**
-- Push back with technical reasoning
-- Show code/tests that prove it works
-- Request clarification
+**若 reviewer 誤：**
+- 以技術推理駁
+- 示可用之碼/測
+- 求澄清
 
 See template at: requesting-code-review/code-reviewer.md

@@ -7,24 +7,24 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 ## Overview
 
-Guide completion of development work by presenting clear options and handling chosen workflow.
+引 development 竟工，列明選，處所擇流程。
 
-**Core principle:** Verify tests → Present options → Execute choice → Clean up.
+**核心原則：** 驗測 → 列選 → 執擇 → 清理。
 
-**Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
+**開工宣告：** "I'm using the finishing-a-development-branch skill to complete this work."
 
 ## The Process
 
 ### Step 1: Verify Tests
 
-**Before presenting options, verify tests pass:**
+**列選前，驗測過：**
 
 ```bash
 # Run project's test suite
 npm test / cargo test / pytest / go test ./...
 ```
 
-**If tests fail:**
+**若測敗：**
 ```
 Tests failing (<N> failures). Must fix before completing:
 
@@ -33,9 +33,9 @@ Tests failing (<N> failures). Must fix before completing:
 Cannot proceed with merge/PR until tests pass.
 ```
 
-Stop. Don't proceed to Step 2.
+止。勿進 Step 2。
 
-**If tests pass:** Continue to Step 2.
+**若測過：** 進 Step 2。
 
 ### Step 2: Determine Base Branch
 
@@ -44,11 +44,11 @@ Stop. Don't proceed to Step 2.
 git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null
 ```
 
-Or ask: "This branch split from main - is that correct?"
+或問："This branch split from main - is that correct?"
 
 ### Step 3: Present Options
 
-Present exactly these 4 options:
+列此 4 選：
 
 ```
 Implementation complete. What would you like to do?
@@ -61,7 +61,7 @@ Implementation complete. What would you like to do?
 Which option?
 ```
 
-**Don't add explanation** - keep options concise.
+**勿加釋** — 選要簡。
 
 ### Step 4: Execute Choice
 
@@ -84,7 +84,7 @@ git merge <feature-branch>
 git branch -d <feature-branch>
 ```
 
-Then: Cleanup worktree (Step 5)
+後：清理 worktree（Step 5）
 
 #### Option 2: Push and Create PR
 
@@ -103,17 +103,17 @@ EOF
 )"
 ```
 
-Then: Cleanup worktree (Step 5)
+後：清理 worktree（Step 5）
 
 #### Option 3: Keep As-Is
 
-Report: "Keeping branch <name>. Worktree preserved at <path>."
+報："Keeping branch <name>. Worktree preserved at <path>."
 
-**Don't cleanup worktree.**
+**勿清 worktree。**
 
 #### Option 4: Discard
 
-**Confirm first:**
+**先確認：**
 ```
 This will permanently delete:
 - Branch <name>
@@ -123,31 +123,31 @@ This will permanently delete:
 Type 'discard' to confirm.
 ```
 
-Wait for exact confirmation.
+待確切確認。
 
-If confirmed:
+若確：
 ```bash
 git checkout <base-branch>
 git branch -D <feature-branch>
 ```
 
-Then: Cleanup worktree (Step 5)
+後：清理 worktree（Step 5）
 
 ### Step 5: Cleanup Worktree
 
-**For Options 1, 2, 4:**
+**於 Options 1, 2, 4：**
 
-Check if in worktree:
+察是否於 worktree：
 ```bash
 git worktree list | grep $(git branch --show-current)
 ```
 
-If yes:
+若是：
 ```bash
 git worktree remove <worktree-path>
 ```
 
-**For Option 3:** Keep worktree.
+**於 Option 3：** 留 worktree。
 
 ## Quick Reference
 
@@ -160,41 +160,41 @@ git worktree remove <worktree-path>
 
 ## Common Mistakes
 
-**Skipping test verification**
-- **Problem:** Merge broken code, create failing PR
-- **Fix:** Always verify tests before offering options
+**跳測驗**
+- **問題：** Merge 斷碼、造敗 PR
+- **修：** 列選前必驗測
 
-**Open-ended questions**
-- **Problem:** "What should I do next?" → ambiguous
-- **Fix:** Present exactly 4 structured options
+**開放式問**
+- **問題：** "What should I do next?" → 歧
+- **修：** 列確切 4 選
 
-**Automatic worktree cleanup**
-- **Problem:** Remove worktree when might need it (Option 2, 3)
-- **Fix:** Only cleanup for Options 1 and 4
+**自動清 worktree**
+- **問題：** 移或仍需之 worktree（Option 2, 3）
+- **修：** 僅 Options 1, 4 清
 
-**No confirmation for discard**
-- **Problem:** Accidentally delete work
-- **Fix:** Require typed "discard" confirmation
+**無確認即毀**
+- **問題：** 誤刪工
+- **修：** Option 4 須打字 "discard"
 
 ## Red Flags
 
-**Never:**
-- Proceed with failing tests
-- Merge without verifying tests on result
-- Delete work without confirmation
-- Force-push without explicit request
+**絕不：**
+- 測敗而續
+- 未驗 merge 結果測即 merge
+- 無確認即刪
+- 無明請即 force-push
 
-**Always:**
-- Verify tests before offering options
-- Present exactly 4 options
-- Get typed confirmation for Option 4
-- Clean up worktree for Options 1 & 4 only
+**常：**
+- 列選前驗測
+- 列確切 4 選
+- Option 4 取打字確認
+- 僅 Options 1 & 4 清 worktree
 
 ## Integration
 
-**Called by:**
-- **subagent-driven-development** (Step 7) - After all tasks complete
-- **executing-plans** (Step 5) - After all batches complete
+**Called by：**
+- **subagent-driven-development** (Step 7) - 所有任務畢後
+- **executing-plans** (Step 5) - 所有 batch 畢後
 
-**Pairs with:**
-- **using-git-worktrees** - Cleans up worktree created by that skill
+**Pairs with：**
+- **using-git-worktrees** - 清由此 skill 立之 worktree

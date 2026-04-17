@@ -5,31 +5,31 @@ description: "You MUST use this before any creative work - creating features, bu
 
 # Brainstorming Ideas Into Designs
 
-Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
+助化念為成設計與 spec，經自然協對話。
 
-Start by understanding the current project context, then ask batched questions to refine the idea efficiently. Once you understand what you're building, present the design and get user approval.
+先明 project 當 context，後批問以精煉念。明所建後，呈設計，取 user 許。
 
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
+於呈設計且 user 許前，勿呼任何實作 skill、勿書任何 code、勿 scaffold 任何 project、勿行任何實作之舉。此適於**每** project，無論其似簡。
 </HARD-GATE>
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
-Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
+每 project 遵此程。To-do 列、單函工具、config 變——皆然。「簡」project 即未察假設生最多廢工之所。設計可短（真簡者數句即可），然汝**必**呈之並取許。
 
 ## Checklist
 
-You MUST create a task for each of these items and complete them in order:
+汝必為下每項立 task 並依序竟：
 
-1. **Explore project context** — check files, docs, recent commits
-2. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with questions. See the Visual Companion section below.
-3. **Ask clarifying questions** — batch 2–4 related questions per `AskUserQuestion` call; iterate until you have enough to design
-4. **Propose 2-3 approaches** — with trade-offs and your recommendation
-5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
-7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+1. **Explore project context** — 察檔、docs、近 commit
+2. **Offer visual companion**（若議涉視覺）— 為獨訊，勿合於問。見下 Visual Companion 節。
+3. **Ask clarifying questions** — 批 2–4 相關問 per `AskUserQuestion` call；迭至足以設計
+4. **Propose 2-3 approaches** — 附權衡與汝薦
+5. **Present design** — 按複雜度縮放分節，每節後取許
+6. **Write design doc** — 存於 `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` 並 commit
+7. **Spec self-review** — inline 速察 placeholder、矛盾、模糊、scope（見下）
+8. **User reviews written spec** — 請 user 審 spec 檔後再進
+9. **Transition to implementation** — 呼 writing-plans skill 以造實作計劃
 
 ## Process Flow
 
@@ -66,11 +66,11 @@ digraph brainstorming {
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
+**終態即呼 writing-plans。** 勿呼 frontend-design、mcp-builder、或其他實作 skill。Brainstorming 後**唯一**呼之 skill 即 writing-plans。
 
 ## Asking Questions with AskUserQuestion
 
-Use the `AskUserQuestion` tool for all clarifying questions. The tool supports 1–4 questions per call — **always batch as many related questions as possible** to reduce round trips.
+用 `AskUserQuestion` tool 於所有澄清問。Tool 支 1–4 問 per call——**常批盡可能多相關問**以減 round trip。
 
 ### Batching Rules
 
@@ -91,7 +91,7 @@ it's a genuine decision point that gates everything else.
 
 ### Question Design
 
-Each question should have 2–4 structured options with descriptions. The "Other" option is always added automatically — you don't need to include it. Use it when the answer space might not be fully covered by your options.
+每問應有 2–4 structured option 附述。「Other」恆自加——汝不須含之。答空或未全涵時用之。
 
 ```
 Good question design:
@@ -123,7 +123,7 @@ Bad — open-ended with no options (use free text via Other instead):
 
 ### First Question Batch — Standard Opening
 
-For most projects, open with these 3–4 questions in a single call:
+多數 project，以此 3–4 問於一 call 開：
 
 ```
 1. Project/feature scope
@@ -139,102 +139,102 @@ For most projects, open with these 3–4 questions in a single call:
    (Greenfield, adding to existing project, replacing something?)
 ```
 
-After reading the answers, batch another 2–4 questions on the specifics. Typically 2 rounds of batched questions is enough; 3 is the maximum before you have enough to propose approaches.
+讀答後，再批 2–4 問於細。通 2 輪批問即足；3 乃極限於呈法前。
 
 ### When to Use Free Text
 
-Some questions don't have bounded answer sets. In those cases, ask them as plain text (not `AskUserQuestion`) alongside or after structured questions:
+有問無界答集。彼時作純文問（非 `AskUserQuestion`），並於 structured 問旁或後：
 
-- "What are the key domain concepts?" — unbounded, ask as text
-- "Describe the current pain point" — contextual, ask as text
-- "Any other constraints I should know?" — catch-all, ask as text
+- "What are the key domain concepts?" — 無界，以文問
+- "Describe the current pain point" — context，以文問
+- "Any other constraints I should know?" — 收尾，以文問
 
 ## The Process
 
-**Understanding the idea:**
+**明念：**
 
-- Check out the current project state first (files, docs, recent commits)
-- Before asking questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
-- If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
-- Use `AskUserQuestion` for all structured choices. Batch 2–4 per call.
-- Use plain text questions for open-ended or contextual things that don't have bounded options.
-- Focus on understanding: purpose, constraints, success criteria
+- 先察當 project 狀（檔、docs、近 commit）
+- 問前察 scope：若請述多獨立子系統（例如「建 chat + file storage + billing + analytics 之平台」），立旗。勿耗問於應先分解之 project 之細。
+- 若 project 過大，助 user 分子 project：何乃獨片，如何相關，當以何序建？ 後以常設計流 brainstorm 第一子 project。每子 project 有其 spec → plan → impl 環。
+- 用 `AskUserQuestion` 於所有 structured 擇。批 2–4 per call。
+- 用純文問於無界或 context 者。
+- 專注於明：目的、限制、成準
 
-**Exploring approaches:**
+**探法：**
 
-- Propose 2-3 different approaches with trade-offs
-- Present options conversationally with your recommendation and reasoning
-- Lead with your recommended option and explain why
+- 呈 2-3 法附權衡
+- 對話式呈選，附汝薦與因
+- 領以汝薦者並釋何以
 
-**Presenting the design:**
+**呈設計：**
 
-- Once you believe you understand what you're building, present the design
-- Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
-- Ask after each section whether it looks right so far
-- Cover: architecture, components, data flow, error handling, testing
-- Be ready to go back and clarify if something doesn't make sense
+- 明所建後，呈設計
+- 每節按複雜度縮放：簡者數句，細者 200-300 字
+- 每節後問觀之宜否
+- 涵：架構、組件、資料流、錯處、測
+- 備若不合則回澄
 
-**Design for isolation and clarity:**
+**設計為孤立與清晰：**
 
-- Break the system into smaller units that each have one clear purpose, communicate through well-defined interfaces, and can be understood and tested independently
-- For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?
-- Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.
-- Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.
+- 拆系為小單——各一明目、經明介面通、可獨明且測
+- 每單，汝當能答：何為，如何用，依何
+- 他人可不讀內即明何為否？可改內而不破用者否？ 否則界須重。
+- 小而界明之單亦汝易工——汝善推理於可一時持於 context 之碼，編小專檔更可靠。檔漸大乃其作過多之兆。
 
-**Working in existing codebases:**
+**於既 codebase：**
 
-- Explore the current structure before proposing changes. Follow existing patterns.
-- Where existing code has problems that affect the work (e.g., a file that's grown too large, unclear boundaries, tangled responsibilities), include targeted improvements as part of the design - the way a good developer improves code they're working in.
-- Don't propose unrelated refactoring. Stay focused on what serves the current goal.
+- 提變前探當結構。循既式。
+- 既碼有疾影工（例如過大之檔、界不清、責糾結）時，將針對性改作計之部——善 dev 改其所工碼之法。
+- 勿提無關重構。專於當目標。
 
 ## After the Design
 
-**Documentation:**
+**Documentation：**
 
-- Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
+- 書驗過之設計（spec）於 `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
   - (User preferences for spec location override this default)
-- Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
+- 若有 elements-of-style:writing-clearly-and-concisely skill，用之
+- Commit design document 入 git
 
-**Spec Self-Review:**
-After writing the spec document, look at it with fresh eyes:
+**Spec Self-Review：**
+書 spec 後，以新眼察：
 
-1. **Placeholder scan:** Any "TBD", "TODO", incomplete sections, or vague requirements? Fix them.
-2. **Internal consistency:** Do any sections contradict each other? Does the architecture match the feature descriptions?
-3. **Scope check:** Is this focused enough for a single implementation plan, or does it need decomposition?
-4. **Ambiguity check:** Could any requirement be interpreted two different ways? If so, pick one and make it explicit.
+1. **Placeholder scan：** 有「TBD」、「TODO」、缺節、模糊需否？ 修之。
+2. **Internal consistency：** 節間矛盾否？ 架構配功述否？
+3. **Scope check：** 專注足於單 impl 計劃否，或須分解？
+4. **Ambiguity check：** 任何需可兩解否？ 若可，擇一明之。
 
-Fix any issues inline. No need to re-review — just fix and move on.
+Inline 修疾。無需再審——修即進。
 
-**User Review Gate:**
-After the spec review loop passes, ask the user to review the written spec before proceeding:
+**User Review Gate：**
+Spec review 環過後，請 user 審書成之 spec 再進：
 
 > "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
 
-Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
+待 user 答。若請變，作之並再跑 spec review 環。僅於 user 許後進。
 
-**Implementation:**
+**Implementation：**
 
-- Invoke the writing-plans skill to create a detailed implementation plan
-- Do NOT invoke any other skill. writing-plans is the next step.
+- 呼 writing-plans skill 以造詳 impl 計劃
+- 勿呼他 skill。writing-plans 即下一步。
 
 ## Key Principles
 
-- **Batch questions** - Use `AskUserQuestion` with 2–4 questions per call; minimize round trips
-- **Structured options preferred** - Easier to answer than open-ended when choices are bounded
-- **YAGNI ruthlessly** - Remove unnecessary features from all designs
-- **Explore alternatives** - Always propose 2-3 approaches before settling
-- **Incremental validation** - Present design in sections, get approval before moving on
-- **Be flexible** - Go back and clarify when something doesn't make sense
+- **Batch questions** - 用 `AskUserQuestion` 含 2–4 問 per call；減 round trip
+- **Structured options preferred** - 界明時易答
+- **YAGNI ruthlessly** - 自所有設計除無謂功
+- **Explore alternatives** - 定前常提 2-3 法
+- **Incremental validation** - 分節呈設計，取許方進
+- **Be flexible** - 不合時回澄
 
 ## Visual Companion (mini-IDE)
 
-A browser-based companion that renders markdown+YAML screens Claude writes into the session directory. Replaces the legacy fragment-based companion (which has been removed from this fork). Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
+一 browser-based companion，render Claude 書於 session 目錄之 markdown+YAML screen。替舊 fragment-based companion（已自此 fork 除）。作 tool——非 mode。受 companion 意其可為宜視覺處之問所用；不意每問必經瀏覽器。
 
-**Offering the companion:** When you anticipate that upcoming questions will involve visual content (mockups, layouts, diagrams), offer it once for consent:
+**提 companion：** 當汝料下問涉視覺（mockup、layout、diagram）時，提一次以取同意：
 > "Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. Want to try it? (Requires opening a local URL)"
 
-**This offer MUST be its own message.** Do not combine it with clarifying questions, context summaries, or any other content.
+**此提必為獨訊。** 勿合以澄清問、context 摘、或他內容。
 
 ### Starting the companion
 
@@ -245,11 +245,11 @@ bun run skills/brainstorming/companion/packages/server/src/cli.ts start \
   --doc-root /path/to/project/specs
 ```
 
-The server writes `$SESSION_DIR/server-info` and prints a JSON line with `{url, port, pid}`. Tell the user to open the URL.
+Server 書 `$SESSION_DIR/server-info` 並列印一 JSON 行含 `{url, port, pid}`。告 user 開 URL。
 
 ### Streaming events back into this session
 
-After `companion start`, set up the Monitor once per session:
+`companion start` 後，每 session 設 Monitor 一次：
 
 ```
 Monitor(
@@ -260,12 +260,12 @@ Monitor(
 )
 ```
 
-Each JSON line in `events.jsonl` becomes one notification. Silent means free — no tokens while the user reads.
+`events.jsonl` 每 JSON 行即一 notification。靜即免——user 讀時無 token 耗。
 
 ### Writing screens
 
-See `skills/brainstorming/companion/docs/screen-format.md` for the full reference. Three kinds: `question`, `demo`, `decision`. Each is one markdown file with YAML frontmatter under `$SESSION_DIR/screens/`.
+見 `skills/brainstorming/companion/docs/screen-format.md` 以察全參考。三類：`question`、`demo`、`decision`。各為一 markdown 檔，YAML frontmatter 於 `$SESSION_DIR/screens/` 下。
 
 ### Privacy
 
-Inputs with `private: true` (and all `file-edit` inputs) route through a separate save path that writes directly to the target file and emits only a `saved` event with a sha256 digest — contents never reach Claude through the companion. This does NOT prevent Claude from using its own file-reading tools on the same path; for real secrecy, `.gitignore` it and do not ask Claude to read it.
+`private: true` 之 input（與所有 `file-edit` input）走獨 save path——直書目標檔並僅 emit `saved` event 附 sha256 digest——內容不經 companion 達 Claude。此**不**防 Claude 以己讀檔 tool 讀同 path；真秘者，`.gitignore` 之且勿請 Claude 讀。

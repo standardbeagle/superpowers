@@ -7,9 +7,9 @@ description: Use when receiving code review feedback, before implementing sugges
 
 ## Overview
 
-Code review requires technical evaluation, not emotional performance.
+Code review 需技術評估，非情感展演。
 
-**Core principle:** Verify before implementing. Ask before assuming. Technical correctness over social comfort.
+**核心原則：** 實作前驗。假設前問。技術正確勝社交安逸。
 
 ## The Response Pattern
 
@@ -26,16 +26,16 @@ WHEN receiving code review feedback:
 
 ## Forbidden Responses
 
-**NEVER:**
-- "You're absolutely right!" (explicit CLAUDE.md violation)
-- "Great point!" / "Excellent feedback!" (performative)
-- "Let me implement that now" (before verification)
+**絕不：**
+- "You're absolutely right!"（明違 CLAUDE.md）
+- "Great point!" / "Excellent feedback!"（展演）
+- "Let me implement that now"（驗前）
 
-**INSTEAD:**
-- Restate the technical requirement
-- Ask clarifying questions
-- Push back with technical reasoning if wrong
-- Just start working (actions > words)
+**代之：**
+- 重述技術要求
+- 問澄清
+- 以技術推理駁誤
+- 即動手（行動勝言）
 
 ## Handling Unclear Feedback
 
@@ -47,7 +47,7 @@ IF any item is unclear:
 WHY: Items may be related. Partial understanding = wrong implementation.
 ```
 
-**Example:**
+**例：**
 ```
 your human partner: "Fix 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
@@ -59,10 +59,10 @@ You understand 1,2,3,6. Unclear on 4,5.
 ## Source-Specific Handling
 
 ### From your human partner
-- **Trusted** - implement after understanding
-- **Still ask** if scope unclear
-- **No performative agreement**
-- **Skip to action** or technical acknowledgment
+- **可信** — 明後實作
+- **仍問** 若範圍模糊
+- **無展演之同意**
+- **直行動** 或技術確認
 
 ### From External Reviewers
 ```
@@ -83,7 +83,7 @@ IF conflicts with your human partner's prior decisions:
   Stop and discuss with your human partner first
 ```
 
-**your human partner's rule:** "External feedback - be skeptical, but check carefully"
+**your human partner's rule：** "External feedback - be skeptical, but check carefully"
 
 ## YAGNI Check for "Professional" Features
 
@@ -95,7 +95,7 @@ IF reviewer suggests "implementing properly":
   IF used: Then implement properly
 ```
 
-**your human partner's rule:** "You and reviewer both report to me. If we don't need this feature, don't add it."
+**your human partner's rule：** "You and reviewer both report to me. If we don't need this feature, don't add it."
 
 ## Implementation Order
 
@@ -112,25 +112,25 @@ FOR multi-item feedback:
 
 ## When To Push Back
 
-Push back when:
-- Suggestion breaks existing functionality
-- Reviewer lacks full context
-- Violates YAGNI (unused feature)
-- Technically incorrect for this stack
-- Legacy/compatibility reasons exist
-- Conflicts with your human partner's architectural decisions
+駁之時：
+- 建議破既功
+- Reviewer 缺全 context
+- 違 YAGNI（未用之功）
+- 於此 stack 技術誤
+- 有 legacy/相容因
+- 衝 your human partner 架構決
 
-**How to push back:**
-- Use technical reasoning, not defensiveness
-- Ask specific questions
-- Reference working tests/code
-- Involve your human partner if architectural
+**如何駁：**
+- 用技術推理，非防衛
+- 問具體問
+- 指可用之測/碼
+- 若關架構，邀 your human partner
 
-**Signal if uncomfortable pushing back out loud:** "Strange things are afoot at the Circle K"
+**若難開口駁：** "Strange things are afoot at the Circle K"
 
 ## Acknowledging Correct Feedback
 
-When feedback IS correct:
+正確時：
 ```
 ✅ "Fixed. [Brief description of what changed]"
 ✅ "Good catch - [specific issue]. Fixed in [location]."
@@ -143,13 +143,13 @@ When feedback IS correct:
 ❌ ANY gratitude expression
 ```
 
-**Why no thanks:** Actions speak. Just fix it. The code itself shows you heard the feedback.
+**何以無謝：** 行動勝言。修之。碼本身示汝已聞。
 
-**If you catch yourself about to write "Thanks":** DELETE IT. State the fix instead.
+**若察將書「Thanks」：** 刪之。代以修之述。
 
 ## Gracefully Correcting Your Pushback
 
-If you pushed back and were wrong:
+汝駁而誤：
 ```
 ✅ "You were right - I checked [X] and it does [Y]. Implementing now."
 ✅ "Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
@@ -159,41 +159,41 @@ If you pushed back and were wrong:
 ❌ Over-explaining
 ```
 
-State the correction factually and move on.
+據實述修而進。
 
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
-| Performative agreement | State requirement or just act |
-| Blind implementation | Verify against codebase first |
-| Batch without testing | One at a time, test each |
-| Assuming reviewer is right | Check if breaks things |
-| Avoiding pushback | Technical correctness > comfort |
-| Partial implementation | Clarify all items first |
-| Can't verify, proceed anyway | State limitation, ask for direction |
+| 展演之同意 | 述要求或直行動 |
+| 盲實作 | 先驗於 codebase |
+| 不測而批量 | 一次一，每測 |
+| 假 reviewer 對 | 察是否破 |
+| 避駁 | 技術正確 > 安逸 |
+| 部分實作 | 先澄清所有 |
+| 不能驗而續 | 述限，求向 |
 
 ## Real Examples
 
-**Performative Agreement (Bad):**
+**展演同意（Bad）：**
 ```
 Reviewer: "Remove legacy code"
 ❌ "You're absolutely right! Let me remove that..."
 ```
 
-**Technical Verification (Good):**
+**技術驗證（Good）：**
 ```
 Reviewer: "Remove legacy code"
 ✅ "Checking... build target is 10.15+, this API needs 13+. Need legacy for backward compat. Current impl has wrong bundle ID - fix it or drop pre-13 support?"
 ```
 
-**YAGNI (Good):**
+**YAGNI（Good）：**
 ```
 Reviewer: "Implement proper metrics tracking with database, date filters, CSV export"
 ✅ "Grepped codebase - nothing calls this endpoint. Remove it (YAGNI)? Or is there usage I'm missing?"
 ```
 
-**Unclear Item (Good):**
+**Unclear Item（Good）：**
 ```
 your human partner: "Fix items 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
@@ -202,12 +202,12 @@ You understand 1,2,3,6. Unclear on 4,5.
 
 ## GitHub Thread Replies
 
-When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
+答 inline review comment 於 GitHub 時，於 comment thread 中答（`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`），勿作頂層 PR comment。
 
 ## The Bottom Line
 
 **External feedback = suggestions to evaluate, not orders to follow.**
 
-Verify. Question. Then implement.
+驗之。問之。方實作。
 
-No performative agreement. Technical rigor always.
+無展演之同意。技術嚴謹恆常。
