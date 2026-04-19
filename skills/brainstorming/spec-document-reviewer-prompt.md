@@ -1,10 +1,10 @@
 # Spec Document Reviewer Prompt Template
 
-Use this template when dispatching a spec document reviewer subagent.
+遣 spec document reviewer subagent 之際，用此 template。
 
-**Purpose:** Verify the spec is complete, consistent, and ready for implementation planning.
+**Purpose：** 驗證 spec 完備、一致，可備 implementation planning。
 
-**Dispatch after:** Spec document is written to docs/superpowers/specs/
+**Dispatch after：** Spec document 書畢，納入 docs/superpowers/specs/
 
 ```
 Task tool (general-purpose):
@@ -14,9 +14,9 @@ Task tool (general-purpose):
 
     **Spec to review:** [SPEC_FILE_PATH]
 
-    ## What to Check
+    ## 所當察
 
-    | Category | What to Look For |
+    | Category | 所當察 |
     |----------|------------------|
     | Completeness | TODOs, placeholders, "TBD", incomplete sections |
     | Consistency | Internal contradictions, conflicting requirements |
@@ -24,14 +24,13 @@ Task tool (general-purpose):
     | Scope | Focused enough for a single plan — not covering multiple independent subsystems |
     | YAGNI | Unrequested features, over-engineering |
 
-    ## Calibration
+    ## 衡準
 
-    **Only flag issues that would cause real problems during implementation planning.**
-    A missing section, a contradiction, or a requirement so ambiguous it could be
-    interpreted two different ways — those are issues. Minor wording improvements,
-    stylistic preferences, and "sections less detailed than others" are not.
+    **唯標 issue 之將於 implementation planning 中肇實禍者。**
+    Section 缺失、contradiction、requirement 模糊至可兩解——此乃 issues。Minor wording improvements、
+    stylistic preferences、「sections less detailed than others」皆非。
 
-    Approve unless there are serious gaps that would lead to a flawed plan.
+    Approve，除非有 serious gaps 將致 flawed plan。
 
     ## Output Format
 
@@ -46,4 +45,4 @@ Task tool (general-purpose):
     - [suggestions for improvement]
 ```
 
-**Reviewer returns:** Status, Issues (if any), Recommendations
+**Reviewer returns：** Status, Issues (if any), Recommendations

@@ -2,4 +2,4 @@
 description: "Deprecated - use the superpowers:writing-plans skill instead"
 ---
 
-Tell your human partner that this command is deprecated and will be removed in the next major release. They should ask you to use the "superpowers writing-plans" skill instead.
+告汝人伴：此 command 已廢，次大版將除。當請汝用 "superpowers writing-plans" skill 代之。

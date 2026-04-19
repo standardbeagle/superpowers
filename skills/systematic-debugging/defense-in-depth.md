@@ -2,25 +2,25 @@
 
 ## Overview
 
-When you fix a bug caused by invalid data, adding validation at one place feels sufficient. But that single check can be bypassed by different code paths, refactoring, or mocks.
+修复由 invalid data 所致之 bug，於一处添 validation 似足。然单一之检可为异途 code paths、refactoring 或 mocks 所 bypass。
 
-**Core principle:** Validate at EVERY layer data passes through. Make the bug structurally impossible.
+**Core principle：** 凡 data 所经之层，皆当 validate。使 bug 结构上为不可能。
 
 ## Why Multiple Layers
 
-Single validation: "We fixed the bug"
-Multiple layers: "We made the bug impossible"
+Single validation："We fixed the bug"
+Multiple layers："We made the bug impossible"
 
-Different layers catch different cases:
-- Entry validation catches most bugs
-- Business logic catches edge cases
-- Environment guards prevent context-specific dangers
-- Debug logging helps when other layers fail
+异层捕异况：
+- Entry validation 捕大多 bugs
+- Business logic 捕 edge cases
+- Environment guards 防 context-specific 之险
+- Debug logging 助他层失效之时
 
 ## The Four Layers
 
 ### Layer 1: Entry Point Validation
-**Purpose:** Reject obviously invalid input at API boundary
+**Purpose：** 於 API boundary 拒明显 invalid 之 input
 
 ```typescript
 function createProject(name: string, workingDirectory: string) {
@@ -38,7 +38,7 @@ function createProject(name: string, workingDirectory: string) {
 ```
 
 ### Layer 2: Business Logic Validation
-**Purpose:** Ensure data makes sense for this operation
+**Purpose：** 保 data 於此 operation 为合理
 
 ```typescript
 function initializeWorkspace(projectDir: string, sessionId: string) {
@@ -50,7 +50,7 @@ function initializeWorkspace(projectDir: string, sessionId: string) {
 ```
 
 ### Layer 3: Environment Guards
-**Purpose:** Prevent dangerous operations in specific contexts
+**Purpose：** 於特定 context 禁危险操作
 
 ```typescript
 async function gitInit(directory: string) {
@@ -70,7 +70,7 @@ async function gitInit(directory: string) {
 ```
 
 ### Layer 4: Debug Instrumentation
-**Purpose:** Capture context for forensics
+**Purpose：** 捕 context 以备 forensics
 
 ```typescript
 async function gitInit(directory: string) {
@@ -86,37 +86,37 @@ async function gitInit(directory: string) {
 
 ## Applying the Pattern
 
-When you find a bug:
+得 bug 之时：
 
-1. **Trace the data flow** - Where does bad value originate? Where used?
-2. **Map all checkpoints** - List every point data passes through
-3. **Add validation at each layer** - Entry, business, environment, debug
-4. **Test each layer** - Try to bypass layer 1, verify layer 2 catches it
+1. **Trace the data flow** —— bad value 起於何处？用於何处？
+2. **Map all checkpoints** —— 列 data 所经之每一点
+3. **Add validation at each layer** —— Entry、business、environment、debug
+4. **Test each layer** —— 试 bypass layer 1，验 layer 2 能否捕之
 
 ## Example from Session
 
-Bug: Empty `projectDir` caused `git init` in source code
+Bug：Empty `projectDir` 致 `git init` 於 source code
 
-**Data flow:**
+**Data flow：**
 1. Test setup → empty string
 2. `Project.create(name, '')`
 3. `WorkspaceManager.createWorkspace('')`
-4. `git init` runs in `process.cwd()`
+4. `git init` 行於 `process.cwd()`
 
-**Four layers added:**
-- Layer 1: `Project.create()` validates not empty/exists/writable
-- Layer 2: `WorkspaceManager` validates projectDir not empty
-- Layer 3: `WorktreeManager` refuses git init outside tmpdir in tests
-- Layer 4: Stack trace logging before git init
+**Four layers added：**
+- Layer 1：`Project.create()` validate 非 empty/exists/writable
+- Layer 2：`WorkspaceManager` validate projectDir 非 empty
+- Layer 3：`WorktreeManager` 於 tests 中拒 git init 出 tmpdir
+- Layer 4：git init 前 log stack trace
 
-**Result:** All 1847 tests passed, bug impossible to reproduce
+**Result：** 1847 tests 皆过，bug 不可复现
 
 ## Key Insight
 
-All four layers were necessary. During testing, each layer caught bugs the others missed:
-- Different code paths bypassed entry validation
-- Mocks bypassed business logic checks
-- Edge cases on different platforms needed environment guards
-- Debug logging identified structural misuse
+四层皆必要。测试之际，各层捕他层所漏：
+- 异 code paths bypass entry validation
+- Mocks bypass business logic checks
+- 异平台之 edge cases 需 environment guards
+- Debug logging 识 structural misuse
 
-**Don't stop at one validation point.** Add checks at every layer.
+**勿止於单一 validation point。** 每层皆添 checks。

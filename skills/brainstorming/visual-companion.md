@@ -1,3 +1,3 @@
 # Visual Companion (mini-IDE)
 
-See `companion/docs/screen-format.md` for the screen format and `SKILL.md` for the start/monitor incantations. The previous HTML-fragment flow is removed; do not reach into `skills/brainstorming/scripts/` — that directory is deleted in a follow-up commit.
+Screen 格式見 `companion/docs/screen-format.md`，start/monitor 咒語見 `SKILL.md`。昔之 HTML-fragment flow 已廢；勿入 `skills/brainstorming/scripts/`——彼目錄將於後續 commit 刪除。

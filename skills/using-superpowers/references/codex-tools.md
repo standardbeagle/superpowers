@@ -1,6 +1,6 @@
 # Codex Tool Mapping
 
-Skills use Claude Code tool names. When you encounter these in a skill, use your platform equivalent:
+Skills 以 Claude Code tool names 為準。遇之於 skill 中，當以 platform equivalent 替之：
 
 | Skill references | Codex equivalent |
 |-----------------|------------------|
@@ -15,28 +15,26 @@ Skills use Claude Code tool names. When you encounter these in a skill, use your
 
 ## Subagent dispatch requires multi-agent support
 
-Add to your Codex config (`~/.codex/config.toml`):
+Codex config (`~/.codex/config.toml`) 中添加：
 
 ```toml
 [features]
 multi_agent = true
 ```
 
-This enables `spawn_agent`, `wait`, and `close_agent` for skills like `dispatching-parallel-agents` and `subagent-driven-development`.
+此舉啟用 `spawn_agent`, `wait`, `close_agent`，以供 `dispatching-parallel-agents` 及 `subagent-driven-development` 諸 skill 之用。
 
 ## Named agent dispatch
 
-Claude Code skills reference named agent types like `superpowers:code-reviewer`.
-Codex does not have a named agent registry — `spawn_agent` creates generic agents
-from built-in roles (`default`, `explorer`, `worker`).
+Claude Code skills 引用 named agent types，如 `superpowers:code-reviewer`。
+Codex 無 named agent registry — `spawn_agent` 自 built-in roles (`default`, `explorer`, `worker`) 創建 generic agents。
 
-When a skill says to dispatch a named agent type:
+Skill 謂 dispatch named agent type 時：
 
-1. Find the agent's prompt file (e.g., `agents/code-reviewer.md` or the skill's
-   local prompt template like `code-quality-reviewer-prompt.md`)
-2. Read the prompt content
-3. Fill any template placeholders (`{BASE_SHA}`, `{WHAT_WAS_IMPLEMENTED}`, etc.)
-4. Spawn a `worker` agent with the filled content as the `message`
+1. 尋 agent prompt file（如 `agents/code-reviewer.md` 或 skill 本地之 prompt template，如 `code-quality-reviewer-prompt.md`）
+2. 讀 prompt content
+3. 填 template placeholders（`{BASE_SHA}`, `{WHAT_WAS_IMPLEMENTED}`, 等）
+4. Spawn `worker` agent，以填畢之 content 為 `message`
 
 | Skill instruction | Codex equivalent |
 |-------------------|------------------|
@@ -45,8 +43,7 @@ When a skill says to dispatch a named agent type:
 
 ### Message framing
 
-The `message` parameter is user-level input, not a system prompt. Structure it
-for maximum instruction adherence:
+`message` parameter 乃 user-level input，非 system prompt。當結構之，以 maximize instruction adherence：
 
 ```
 Your task is to perform the following. Follow the instructions below exactly.
@@ -59,21 +56,18 @@ Execute this now. Output ONLY the structured response following the format
 specified in the instructions above.
 ```
 
-- Use task-delegation framing ("Your task is...") rather than persona framing ("You are...")
-- Wrap instructions in XML tags — the model treats tagged blocks as authoritative
-- End with an explicit execution directive to prevent summarization of the instructions
+- 以 task-delegation framing（"Your task is..."）為尚，而非 persona framing（"You are..."）
+- 以 XML tags 包裹 instructions — model 視 tagged blocks 為 authoritative
+- 以 explicit execution directive 結之，以防 instructions 之 summarization
 
 ### When this workaround can be removed
 
-This approach compensates for Codex's plugin system not yet supporting an `agents`
-field in `plugin.json`. When `RawPluginManifest` gains an `agents` field, the
-plugin can symlink to `agents/` (mirroring the existing `skills/` symlink) and
-skills can dispatch named agent types directly.
+此法補 Codex plugin system 尚未支持 `agents` field 於 `plugin.json` 之缺。
+待 `RawPluginManifest` 增 `agents` field，plugin 可 symlink 至 `agents/`（如現有 `skills/` symlink），skills 即可直接 dispatch named agent types。
 
 ## Environment Detection
 
-Skills that create worktrees or finish branches should detect their
-environment with read-only git commands before proceeding:
+Skills 之創建 worktrees 或 finish branches 者，當以 read-only git commands 探測 environment，而後行之：
 
 ```bash
 GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
@@ -81,20 +75,16 @@ GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
 BRANCH=$(git branch --show-current)
 ```
 
-- `GIT_DIR != GIT_COMMON` → already in a linked worktree (skip creation)
-- `BRANCH` empty → detached HEAD (cannot branch/push/PR from sandbox)
+- `GIT_DIR != GIT_COMMON` → 已於 linked worktree 中（skip creation）
+- `BRANCH` empty → detached HEAD（sandbox 中不可 branch/push/PR）
 
-See `using-git-worktrees` Step 0 and `finishing-a-development-branch`
-Step 1 for how each skill uses these signals.
+見 `using-git-worktrees` Step 0 及 `finishing-a-development-branch` Step 1，知各 skill 如何使用此等 signals。
 
 ## Codex App Finishing
 
-When the sandbox blocks branch/push operations (detached HEAD in an
-externally managed worktree), the agent commits all work and informs
-the user to use the App's native controls:
+Sandbox 阻 branch/push operations（detached HEAD 於 externally managed worktree）時，agent 當 commit all work，並告之 user 以 App native controls 行之：
 
-- **"Create branch"** — names the branch, then commit/push/PR via App UI
-- **"Hand off to local"** — transfers work to the user's local checkout
+- **"Create branch"** — 命名 branch，而後 commit/push/PR via App UI
+- **"Hand off to local"** — 將 work transfer 至 user local checkout
 
-The agent can still run tests, stage files, and output suggested branch
-names, commit messages, and PR descriptions for the user to copy.
+Agent 仍可 run tests, stage files，並輸出 suggested branch names, commit messages, PR descriptions，以供 user copy。

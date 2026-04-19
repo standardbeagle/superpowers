@@ -2,9 +2,9 @@
 
 ## Overview
 
-Flaky tests often guess at timing with arbitrary delays. This creates race conditions where tests pass on fast machines but fail under load or in CI.
+Flaky tests 常以 arbitrary delay 臆测时机。乃生 race condition —— 快机则过，负载或 CI 则败。
 
-**Core principle:** Wait for the actual condition you care about, not a guess about how long it takes.
+**Core principle：** 候所关心之实状，非臆测所需之时。
 
 ## When to Use
 
@@ -21,15 +21,15 @@ digraph when_to_use {
 }
 ```
 
-**Use when:**
-- Tests have arbitrary delays (`setTimeout`, `sleep`, `time.sleep()`)
-- Tests are flaky (pass sometimes, fail under load)
-- Tests timeout when run in parallel
-- Waiting for async operations to complete
+**Use when：**
+- Tests 含 arbitrary delay（`setTimeout`、`sleep`、`time.sleep()`）
+- Tests flaky（时过时效）
+- Tests 并行则 timeout
+- 候 async operations 之完成
 
-**Don't use when:**
-- Testing actual timing behavior (debounce, throttle intervals)
-- Always document WHY if using arbitrary timeout
+**Don't use when：**
+- 测实 timing behavior（debounce、throttle intervals）
+- 若用 arbitrary timeout，必 document 其因
 
 ## Core Pattern
 
@@ -57,7 +57,7 @@ expect(result).toBeDefined();
 
 ## Implementation
 
-Generic polling function:
+Generic polling function：
 ```typescript
 async function waitFor<T>(
   condition: () => T | undefined | null | false,
@@ -79,18 +79,18 @@ async function waitFor<T>(
 }
 ```
 
-See `condition-based-waiting-example.ts` in this directory for complete implementation with domain-specific helpers (`waitForEvent`, `waitForEventCount`, `waitForEventMatch`) from actual debugging session.
+详见此目录 `condition-based-waiting-example.ts` —— 完整实现，附 domain-specific helpers（`waitForEvent`、`waitForEventCount`、`waitForEventMatch`），出自实调 session。
 
 ## Common Mistakes
 
-**❌ Polling too fast:** `setTimeout(check, 1)` - wastes CPU
-**✅ Fix:** Poll every 10ms
+**❌ Polling too fast：** `setTimeout(check, 1)` —— 耗 CPU
+**✅ Fix：** Poll every 10ms
 
-**❌ No timeout:** Loop forever if condition never met
-**✅ Fix:** Always include timeout with clear error
+**❌ No timeout：** 若 condition 永不成，则 loop 无穷
+**✅ Fix：** 必含 timeout，附 clear error
 
-**❌ Stale data:** Cache state before loop
-**✅ Fix:** Call getter inside loop for fresh data
+**❌ Stale data：** 於 loop 前 cache state
+**✅ Fix：** 於 loop 内 call getter 以得 fresh data
 
 ## When Arbitrary Timeout IS Correct
 
@@ -101,15 +101,15 @@ await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behavior
 // 200ms = 2 ticks at 100ms intervals - documented and justified
 ```
 
-**Requirements:**
-1. First wait for triggering condition
-2. Based on known timing (not guessing)
-3. Comment explaining WHY
+**Requirements：**
+1. 先候 triggering condition
+2. 基 known timing（非臆测）
+3. Comment 释其因
 
 ## Real-World Impact
 
-From debugging session (2025-10-03):
-- Fixed 15 flaky tests across 3 files
-- Pass rate: 60% → 100%
-- Execution time: 40% faster
-- No more race conditions
+出自调试 session（2025-10-03）：
+- 修复 15 flaky tests，跨 3 files
+- Pass rate：60% → 100%
+- Execution time：快 40%
+- Race condition 不复见

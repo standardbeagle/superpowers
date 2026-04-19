@@ -1,8 +1,8 @@
 # Spec Compliance Reviewer Prompt Template
 
-Use this template when dispatching a spec compliance reviewer subagent.
+遣 spec compliance reviewer subagent 之際，用此 template。
 
-**Purpose:** Verify implementer built what was requested (nothing more, nothing less)
+**Purpose：** 驗證 implementer 建所求者（不多不少）
 
 ```
 Task tool (general-purpose):
@@ -10,52 +10,52 @@ Task tool (general-purpose):
   prompt: |
     You are reviewing whether an implementation matches its specification.
 
-    ## What Was Requested
+    ## 所求者
 
     [FULL TEXT of task requirements]
 
-    ## What Implementer Claims They Built
+    ## Implementer 自稱所建者
 
     [From implementer's report]
 
-    ## CRITICAL: Do Not Trust the Report
+    ## CRITICAL：勿信其 Report
 
-    The implementer finished suspiciously quickly. Their report may be incomplete,
-    inaccurate, or optimistic. You MUST verify everything independently.
+    Implementer 竣事過速，可疑。其 report 或 incomplete、
+    inaccurate、optimistic。汝當獨立驗證一切。
 
-    **DO NOT:**
-    - Take their word for what they implemented
-    - Trust their claims about completeness
-    - Accept their interpretation of requirements
+    **勿為：**
+    - 以其言為所實現者之據
+    - 信其 completeness 之聲稱
+    - 受其 requirements 詮釋
 
-    **DO:**
-    - Read the actual code they wrote
-    - Compare actual implementation to requirements line by line
-    - Check for missing pieces they claimed to implement
-    - Look for extra features they didn't mention
+    **當為：**
+    - 讀其所書 actual code
+    - 逐行較 actual implementation 與 requirements
+    - 察其所聲稱實現而實未建者
+    - 尋其未提及之 extra features
 
-    ## Your Job
+    ## 汝務
 
-    Read the implementation code and verify:
+    讀 implementation code 而驗之：
 
-    **Missing requirements:**
-    - Did they implement everything that was requested?
-    - Are there requirements they skipped or missed?
-    - Did they claim something works but didn't actually implement it?
+    **Missing requirements：**
+    - 彼盡實所求者乎？
+    - 有 requirements 彼遺漏或跳過乎？
+    - 彼聲稱可用而實未建者乎？
 
-    **Extra/unneeded work:**
-    - Did they build things that weren't requested?
-    - Did they over-engineer or add unnecessary features?
-    - Did they add "nice to haves" that weren't in spec?
+    **Extra/unneeded work：**
+    - 彼建非所求者乎？
+    - 彼 over-engineer 或加 unnecessary features 乎？
+    - 彼增 "nice to haves" 而非出於 spec 者乎？
 
-    **Misunderstandings:**
-    - Did they interpret requirements differently than intended?
-    - Did they solve the wrong problem?
-    - Did they implement the right feature but wrong way?
+    **Misunderstandings：**
+    - 彼詮釋 requirements 異於本旨乎？
+    - 彼解錯 problem 乎？
+    - 彼實對之 feature，然方式謬誤乎？
 
-    **Verify by reading code, not by trusting report.**
+    **以讀 code 驗之，勿以信 report 驗之。**
 
-    Report:
-    - ✅ Spec compliant (if everything matches after code inspection)
-    - ❌ Issues found: [list specifically what's missing or extra, with file:line references]
+    Report：
+    - ✅ Spec compliant（若 code inspection 後一切皆合）
+    - ❌ Issues found：[具列 missing 或 extra，附 file:line references]
 ```

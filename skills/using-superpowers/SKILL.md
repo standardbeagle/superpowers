@@ -8,7 +8,7 @@ If you were dispatched as a subagent to execute a specific task, skip this skill
 </SUBAGENT-STOP>
 
 <EXTREMELY-IMPORTANT>
-若汝思有 1% 之機 skill 適於所為，汝**絕對必**呼 skill。
+若思 skill 有一成機適於所為，汝**絕對必**呼 skill。
 
 若 skill 適汝任，汝無擇。必用之。
 
@@ -43,7 +43,7 @@ Skill 用 Claude Code tool 名。非 CC platform：見 `references/copilot-tools
 
 ## The Rule
 
-**任答或行前呼適或所請之 skill。** 有 1% 機 skill 適 = 應呼以察。若所呼 skill 於情境不適，則不用之。
+**任答或行前呼適或所請之 skill。** 有一成機 skill 適 = 應呼以察。若所呼 skill 於情境不適，則不用之。
 
 ```dot
 digraph skill_flow {
@@ -77,7 +77,7 @@ digraph skill_flow {
 
 ## Red Flags
 
-此等念即止——汝在託辭：
+此等念即止——汝託辭：
 
 | Thought | Reality |
 |---------|---------|
@@ -114,4 +114,4 @@ Skill 本告汝為何型。
 
 ## User Instructions
 
-指令述**何**，非**如何**。"Add X" 或 "Fix Y" 不意跳 workflow。
+指令述**何**，非**如何**。

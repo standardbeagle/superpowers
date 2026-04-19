@@ -2,125 +2,125 @@
 
 ## Overview
 
-LLMs respond to the same persuasion principles as humans. Understanding this psychology helps you design more effective skills - not to manipulate, but to ensure critical practices are followed even under pressure.
+LLMs 與 humans 同，皆受 persuasion principles 之影響。明此 psychology，則 skill design 更有效 — 非為 manipulation，乃確保 critical practices 雖處壓力之下，亦得遵行。
 
-**Research foundation:** Meincke et al. (2025) tested 7 persuasion principles with N=28,000 AI conversations. Persuasion techniques more than doubled compliance rates (33% → 72%, p < .001).
+**Research foundation：** Meincke et al. (2025) 以 N=28,000 AI conversations 測試 7 種 persuasion principles。Persuasion techniques 使 compliance rates 倍增（33% → 72%, p < .001）。
 
 ## The Seven Principles
 
 ### 1. Authority
-**What it is:** Deference to expertise, credentials, or official sources.
+**What it is：** Deference to expertise, credentials, or official sources.
 
-**How it works in skills:**
+**How it works in skills：**
 - Imperative language: "YOU MUST", "Never", "Always"
 - Non-negotiable framing: "No exceptions"
 - Eliminates decision fatigue and rationalization
 
-**When to use:**
-- Discipline-enforcing skills (TDD, verification requirements)
+**When to use：**
+- Discipline-enforcing skills（TDD, verification requirements）
 - Safety-critical practices
 - Established best practices
 
-**Example:**
+**Example：**
 ```markdown
 ✅ Write code before test? Delete it. Start over. No exceptions.
 ❌ Consider writing tests first when feasible.
 ```
 
 ### 2. Commitment
-**What it is:** Consistency with prior actions, statements, or public declarations.
+**What it is：** Consistency with prior actions, statements, or public declarations.
 
-**How it works in skills:**
+**How it works in skills：**
 - Require announcements: "Announce skill usage"
 - Force explicit choices: "Choose A, B, or C"
 - Use tracking: TodoWrite for checklists
 
-**When to use:**
+**When to use：**
 - Ensuring skills are actually followed
 - Multi-step processes
 - Accountability mechanisms
 
-**Example:**
+**Example：**
 ```markdown
 ✅ When you find a skill, you MUST announce: "I'm using [Skill Name]"
 ❌ Consider letting your partner know which skill you're using.
 ```
 
 ### 3. Scarcity
-**What it is:** Urgency from time limits or limited availability.
+**What it is：** Urgency from time limits or limited availability.
 
-**How it works in skills:**
+**How it works in skills：**
 - Time-bound requirements: "Before proceeding"
 - Sequential dependencies: "Immediately after X"
 - Prevents procrastination
 
-**When to use:**
+**When to use：**
 - Immediate verification requirements
 - Time-sensitive workflows
 - Preventing "I'll do it later"
 
-**Example:**
+**Example：**
 ```markdown
 ✅ After completing a task, IMMEDIATELY request code review before proceeding.
 ❌ You can review code when convenient.
 ```
 
 ### 4. Social Proof
-**What it is:** Conformity to what others do or what's considered normal.
+**What it is：** Conformity to what others do or what's considered normal.
 
-**How it works in skills:**
+**How it works in skills：**
 - Universal patterns: "Every time", "Always"
 - Failure modes: "X without Y = failure"
 - Establishes norms
 
-**When to use:**
+**When to use：**
 - Documenting universal practices
 - Warning about common failures
 - Reinforcing standards
 
-**Example:**
+**Example：**
 ```markdown
 ✅ Checklists without TodoWrite tracking = steps get skipped. Every time.
 ❌ Some people find TodoWrite helpful for checklists.
 ```
 
 ### 5. Unity
-**What it is:** Shared identity, "we-ness", in-group belonging.
+**What it is：** Shared identity, "we-ness", in-group belonging.
 
-**How it works in skills:**
+**How it works in skills：**
 - Collaborative language: "our codebase", "we're colleagues"
 - Shared goals: "we both want quality"
 
-**When to use:**
+**When to use：**
 - Collaborative workflows
 - Establishing team culture
 - Non-hierarchical practices
 
-**Example:**
+**Example：**
 ```markdown
 ✅ We're colleagues working together. I need your honest technical judgment.
 ❌ You should probably tell me if I'm wrong.
 ```
 
 ### 6. Reciprocity
-**What it is:** Obligation to return benefits received.
+**What it is：** Obligation to return benefits received.
 
-**How it works:**
+**How it works：**
 - Use sparingly - can feel manipulative
 - Rarely needed in skills
 
-**When to avoid:**
-- Almost always (other principles more effective)
+**When to avoid：**
+- Almost always（other principles more effective）
 
 ### 7. Liking
-**What it is:** Preference for cooperating with those we like.
+**What it is：** Preference for cooperating with those we like.
 
-**How it works:**
+**How it works：**
 - **DON'T USE for compliance**
 - Conflicts with honest feedback culture
 - Creates sycophancy
 
-**When to avoid:**
+**When to avoid：**
 - Always for discipline enforcement
 
 ## Principle Combinations by Skill Type
@@ -134,35 +134,35 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 
 ## Why This Works: The Psychology
 
-**Bright-line rules reduce rationalization:**
+**Bright-line rules reduce rationalization：**
 - "YOU MUST" removes decision fatigue
 - Absolute language eliminates "is this an exception?" questions
 - Explicit anti-rationalization counters close specific loopholes
 
-**Implementation intentions create automatic behavior:**
+**Implementation intentions create automatic behavior：**
 - Clear triggers + required actions = automatic execution
 - "When X, do Y" more effective than "generally do Y"
 - Reduces cognitive load on compliance
 
-**LLMs are parahuman:**
+**LLMs are parahuman：**
 - Trained on human text containing these patterns
 - Authority language precedes compliance in training data
-- Commitment sequences (statement → action) frequently modeled
-- Social proof patterns (everyone does X) establish norms
+- Commitment sequences（statement → action）frequently modeled
+- Social proof patterns（everyone does X）establish norms
 
 ## Ethical Use
 
-**Legitimate:**
+**Legitimate：**
 - Ensuring critical practices are followed
 - Creating effective documentation
 - Preventing predictable failures
 
-**Illegitimate:**
+**Illegitimate：**
 - Manipulating for personal gain
 - Creating false urgency
 - Guilt-based compliance
 
-**The test:** Would this technique serve the user's genuine interests if they fully understood it?
+**The test：** Would this technique serve the user's genuine interests if they fully understood it?
 
 ## Research Citations
 
@@ -180,8 +180,8 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 
 When designing a skill, ask:
 
-1. **What type is it?** (Discipline vs. guidance vs. reference)
+1. **What type is it?**（Discipline vs. guidance vs. reference）
 2. **What behavior am I trying to change?**
-3. **Which principle(s) apply?** (Usually authority + commitment for discipline)
-4. **Am I combining too many?** (Don't use all seven)
-5. **Is this ethical?** (Serves user's genuine interests?)
+3. **Which principle(s) apply?**（Usually authority + commitment for discipline）
+4. **Am I combining too many?**（Don't use all seven）
+5. **Is this ethical?**（Serves user's genuine interests?）

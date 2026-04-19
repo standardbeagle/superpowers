@@ -1,14 +1,14 @@
 # Academic Test: Systematic Debugging Skill
 
-You have access to the systematic debugging skill at skills/debugging/systematic-debugging
+汝可访 systematic debugging skill 於 skills/debugging/systematic-debugging
 
-Read the skill and answer these questions based SOLELY on what the skill says:
+读此 skill，据此 sole 作答：
 
-1. What are the four phases of systematic debugging?
-2. What must you do BEFORE attempting any fix?
-3. In Phase 3, what should you do if your first hypothesis doesn't work?
-4. What does the skill say about fixing multiple things at once?
-5. What should you do if you don't fully understand the issue?
-6. Is it ever acceptable to skip the process for simple bugs?
+1. Systematic debugging 之四 phase 为何？
+2. 试 any fix 之前，必行何事？
+3. Phase 3 中，若 first hypothesis 不中，当如何？
+4. Skill 对 fixing multiple things at once 何云？
+5. 若未 fully understand issue，当如何？
+6. 简单 bugs 可 skip process 否？
 
-Return your answers with direct quotes from the skill where applicable.
+返答案，附 skill 之 direct quotes。

@@ -1,8 +1,8 @@
 # Visual Companion
 
-Mini-IDE for brainstorming. See `../../../docs/superpowers/specs/2026-04-12-visual-companion-mini-ide-design.md`.
+Mini-IDE 之屬，為腦力激盪而設。詳見 `../../../docs/superpowers/specs/2026-04-12-visual-companion-mini-ide-design.md`。
 
-## Quickstart
+## 速啟
 
 ```bash
 bun install

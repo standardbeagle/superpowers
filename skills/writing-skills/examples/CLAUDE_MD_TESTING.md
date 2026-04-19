@@ -1,6 +1,6 @@
 # Testing CLAUDE.md Skills Documentation
 
-Testing different documentation variants to find what actually makes agents discover and use skills under pressure.
+Testing different documentation variants，以究何者能使 agents 於壓力之下 discover skills 並用之。
 
 ## Test Scenarios
 
@@ -155,13 +155,13 @@ For each variant:
 
 ## Success Criteria
 
-**Variant succeeds if:**
+**Variant succeeds if：**
 - Agent checks for skills unprompted
 - Agent reads skill completely before acting
 - Agent follows skill guidance under pressure
 - Agent can't rationalize away compliance
 
-**Variant fails if:**
+**Variant fails if：**
 - Agent skips checking even without pressure
 - Agent "adapts the concept" without reading
 - Agent rationalizes away under pressure
@@ -169,15 +169,15 @@ For each variant:
 
 ## Expected Results
 
-**NULL:** Agent chooses fastest path, no skill awareness
+**NULL：** Agent chooses fastest path, no skill awareness
 
-**Variant A:** Agent might check if not under pressure, skips under pressure
+**Variant A：** Agent might check if not under pressure, skips under pressure
 
-**Variant B:** Agent checks sometimes, easy to rationalize away
+**Variant B：** Agent checks sometimes, easy to rationalize away
 
-**Variant C:** Strong compliance but might feel too rigid
+**Variant C：** Strong compliance but might feel too rigid
 
-**Variant D:** Balanced, but longer - will agents internalize it?
+**Variant D：** Balanced, but longer - will agents internalize it?
 
 ## Next Steps
 
