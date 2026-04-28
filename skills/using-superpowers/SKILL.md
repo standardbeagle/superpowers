@@ -115,3 +115,18 @@ Skill 本告汝為何型。
 ## User Instructions
 
 指令述**何**，非**如何**。
+
+## Agent-Gated Skills (context savings)
+
+重 procedural skill 配 subagent。主 thread 派 agent；agent 於己 context 載 skill，返 wenyan dict。Skill 身不入主 context。
+
+| Work | Dispatch | Skill loaded inside subagent |
+|------|----------|------------------------------|
+| Bug / test failure | `debugger` | systematic-debugging |
+| Feature / behavior design | `brainstormer` | brainstorming |
+| Implement / fix with tests | `tdd-runner` | test-driven-development |
+| Author / edit a skill | `skill-author` | writing-skills |
+| Multi-step plan + dispatch | `plan-runner` | writing-plans, executing-plans, subagent-driven-development, dispatching-parallel-agents |
+| Pre-commit / review feedback | `review-cycle` | verification-before-completion, requesting-code-review, receiving-code-review |
+
+Direct `Skill` invocation 仍合法。彼於主 context 載 skill。短任直呼；重任派 agent。
