@@ -236,43 +236,11 @@ writing-plans 為 brainstorming 後**唯一**先呼之 skill；勿呼 frontend-d
 
 ## Visual Companion (mini-IDE)
 
-一 browser-based companion，render Claude 書於 session 目錄之 markdown+YAML screen。替舊 fragment-based companion（已自此 fork 除）。此乃 High-Bandwidth Intake 之**主通道**：decision-tree 與 feedback screen 經此呈，壓往返。亦載視覺（mockup、layout、diagram、demo）。
+High-Bandwidth Intake 之**主通道**乃 `interactive-companion` skill——一 browser-based mini-IDE，render markdown+YAML screen（decision-tree、feedback field、mockup、diagram、demo、decision gate），答經 `events.jsonl` 流回。**呼 `interactive-companion` skill 以察全用法**（啟動、寫 screen、Monitor、privacy）。此處僅誌 brainstorming 之專用法：
 
-**提 companion：** 揭問域後，提一次以取同意——既為視覺，亦為一次盡填之 intake 表：
-> "I'd like to put these questions in a small web form so you can answer them all at once instead of back-and-forth — it can also show mockups, diagrams, and comparisons as we go. Want to try it? (Requires opening a local URL)"
-
-**此提必為獨訊。** 勿合以澄清問、context 摘、或他內容。若 user 拒，落回 `AskUserQuestion` micro-batch。
-
-### Starting the companion
-
-```bash
-bun run skills/brainstorming/companion/packages/server/src/cli.ts start \
-  --session-dir /path/to/project/.superpowers/brainstorm/<session> \
-  --doc-root /path/to/project/docs \
-  --doc-root /path/to/project/specs
-```
-
-Server 書 `$SESSION_DIR/server-info` 並列印一 JSON 行含 `{url, port, pid}`。告 user 開 URL。
-
-### Streaming events back into this session
-
-`companion start` 後，每 session 設 Monitor 一次：
-
-```
-Monitor(
-  description: "brainstorming companion events",
-  command:     "tail -n 0 -F $SESSION_DIR/events.jsonl | grep --line-buffered -v '^$'",
-  persistent:  true,
-  timeout_ms:  3600000
-)
-```
-
-`events.jsonl` 每 JSON 行即一 notification。靜即免——user 讀時無 token 耗。
-
-### Writing screens
-
-見 `skills/brainstorming/companion/docs/screen-format.md` 以察全參考。三類：`question`、`demo`、`decision`。各為一 markdown 檔，YAML frontmatter 於 `$SESSION_DIR/screens/` 下。
-
-### Privacy
-
-`private: true` 之 input（與所有 `file-edit` input）走獨 save path——直書目標檔並僅 emit `saved` event 附 sha256 digest——內容不經 companion 達 Claude。此**不**防 Claude 以己讀檔 tool 讀同 path；真秘者，`.gitignore` 之且勿請 Claude 讀。
+- **提 companion：** 揭問域後，提一次以取同意（獨訊，勿合他內容）：
+  > "I'd like to put these questions in a small web form so you can answer them all at once instead of back-and-forth — it can also show mockups, diagrams, and comparisons as we go. Want to try it? (Requires opening a local URL)"
+- 用 session dir `.superpowers/brainstorm/<session>`。
+- 每域一 `question` screen（decision-tree + feedback field）；exec-mode 與 design overview 作 `decision` screen。
+- 答流入即遣 subagent 並行消化（見 High-Bandwidth Intake 節）。
+- 若 user 拒，落回 `AskUserQuestion` micro-batch。
