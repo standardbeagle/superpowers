@@ -5,12 +5,12 @@ description: "You MUST use this before any creative work - creating features, bu
 
 # Brainstorming Ideas Into Designs
 
-助化念為成設計與 spec，經自然協對話。
+助化念為成設計與 spec，經結構化、低往返之協對話。
 
-先明 project 當 context，後批問以精煉念。明所建後，呈設計，取 user 許。
+先明 project 當 context。次**揭問域之全景**——告 user 凡幾組問、各覆何域（前端、安全、資料儲存…），而非逕入細節。後以 companion decision-tree + feedback-field screen 一次盡呈諸問，趁答流入即遣 subagent 並行消化之。終以**可批准之設計綱要**（先涵風險元）取許，再展細設計而起工。
 
 <HARD-GATE>
-於呈設計且 user 許前，勿呼任何實作 skill、勿書任何 code、勿 scaffold 任何 project、勿行任何實作之舉。此適於**每** project，無論其似簡。
+於呈**可批准之設計綱要**且 user 許前，勿呼任何實作 skill、勿書任何 code、勿 scaffold 任何 project、勿行任何實作之舉。此適於**每** project，無論其似簡。（步 3 之 execution-mode 問為規劃決策，非實作，可早問。）
 </HARD-GATE>
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
@@ -22,55 +22,100 @@ description: "You MUST use this before any creative work - creating features, bu
 汝必為下每項立 task 並依序竟：
 
 1. **Explore project context** — 察檔、docs、近 commit
-2. **Offer visual companion**（若議涉視覺）— 為獨訊，勿合於問。見下 Visual Companion 節。
-3. **Ask clarifying questions** — 批 2–4 相關問 per `AskUserQuestion` call；迭至足以設計
-4. **Propose 2-3 approaches** — 附權衡與汝薦
-5. **Present design** — 按複雜度縮放分節，每節後取許
-6. **Write design doc** — 存於 `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` 並 commit
-7. **Spec self-review** — inline 速察 placeholder、矛盾、模糊、scope（見下）
-8. **User reviews written spec** — 請 user 審 spec 檔後再進
-9. **Transition to implementation** — 呼 writing-plans skill 以造實作計劃
+2. **Outline question domains** — 告 user 凡幾組問、各覆何域（例：「建前先有三組問——前端、安全需求、資料儲存格式」）。此為 user 之 information-scent map，令彼預知互動之幅。
+3. **Ask execution mode (early)** — 揭域時即問**設計畢後如何起工**，三選：① **build inline**（即於此 session 自建）、② **subagent**（遣 subagent 執之）、③ **epic-task-subtask plan**（於 user 偏好之 task system——如 Dart——建 epic→task→subtask 計劃）。此決定後續 transition，故早問。companion 尚未啟（步 4），故以 `AskUserQuestion` 問之，或若已啟 companion 則作首 `decision` screen。例：
+
+```
+AskUserQuestion:
+  question: "After we finish the design, how should I carry out the work?"
+  options:
+    - label: "Build inline"        description: "I implement directly in this session"
+    - label: "Subagent"            description: "Dispatch a subagent to execute the plan"
+    - label: "Task-system epic"    description: "Create epic→task→subtask plan in your task system (e.g. Dart)"
+```
+4. **Start the companion + emit decision-tree screens** — 以 companion 一次盡呈各域之決策樹與 feedback-field，壓往返。見下 Visual Companion 與 High-Bandwidth Intake 節。
+5. **Stream answers into subagents** — 答自 `events.jsonl` 流入即遣 subagent 並行消化（草設計節、探既碼、列風險），勿待全答畢。
+6. **Propose 2-3 approaches** — 附權衡與汝薦
+7. **Present approvable design overview** — 簡綱，先涵風險元（risky/irreversible/load-bearing 之選），取一次許。見下。
+8. **Build detailed design + write design doc** — 許後展細設計，存於 `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`，inline self-review（placeholder、矛盾、模糊、scope），commit
+9. **Transition per chosen execution mode** — 依步 3 之選：inline 自建、遣 subagent、或於 task system 建 epic-task-subtask 計劃。見下 Implementation 節。
 
 ## Process Flow
 
 ```dot
 digraph brainstorming {
     "Explore project context" [shape=box];
-    "Visual questions ahead?" [shape=diamond];
-    "Offer Visual Companion\n(own message, no other content)" [shape=box];
-    "Batch clarifying questions\n(AskUserQuestion, 2-4 per call)" [shape=box];
+    "Outline question domains\n(\"N sets of questions: A, B, C\")" [shape=box];
+    "Ask execution mode\n(inline / subagent / epic-task plan)" [shape=box];
+    "Start companion +\nemit decision-tree screens" [shape=box];
+    "Stream answers -> subagents\n(draft/explore/risk-scan in parallel)" [shape=box];
     "Enough to design?" [shape=diamond];
+    "Follow-up screen\n(only gaps the trees missed)" [shape=box];
     "Propose 2-3 approaches" [shape=box];
-    "Present design sections" [shape=box];
-    "User approves design?" [shape=diamond];
-    "Write design doc" [shape=box];
-    "Spec self-review\n(fix inline)" [shape=box];
-    "User reviews spec?" [shape=diamond];
-    "Invoke writing-plans skill" [shape=doublecircle];
+    "Present approvable design overview\n(risky elements first)" [shape=box];
+    "User approves overview?" [shape=diamond];
+    "Build detailed design +\nwrite + self-review + commit" [shape=box];
+    "Invoke writing-plans skill" [shape=box];
+    "Execute per chosen mode\n(inline / subagent / task-system epic)" [shape=doublecircle];
 
-    "Explore project context" -> "Visual questions ahead?";
-    "Visual questions ahead?" -> "Offer Visual Companion\n(own message, no other content)" [label="yes"];
-    "Visual questions ahead?" -> "Batch clarifying questions\n(AskUserQuestion, 2-4 per call)" [label="no"];
-    "Offer Visual Companion\n(own message, no other content)" -> "Batch clarifying questions\n(AskUserQuestion, 2-4 per call)";
-    "Batch clarifying questions\n(AskUserQuestion, 2-4 per call)" -> "Enough to design?" ;
-    "Enough to design?" -> "Batch clarifying questions\n(AskUserQuestion, 2-4 per call)" [label="no"];
+    "Explore project context" -> "Outline question domains\n(\"N sets of questions: A, B, C\")";
+    "Outline question domains\n(\"N sets of questions: A, B, C\")" -> "Ask execution mode\n(inline / subagent / epic-task plan)";
+    "Ask execution mode\n(inline / subagent / epic-task plan)" -> "Start companion +\nemit decision-tree screens";
+    "Start companion +\nemit decision-tree screens" -> "Stream answers -> subagents\n(draft/explore/risk-scan in parallel)";
+    "Stream answers -> subagents\n(draft/explore/risk-scan in parallel)" -> "Enough to design?";
+    "Enough to design?" -> "Follow-up screen\n(only gaps the trees missed)" [label="no"];
+    "Follow-up screen\n(only gaps the trees missed)" -> "Stream answers -> subagents\n(draft/explore/risk-scan in parallel)";
     "Enough to design?" -> "Propose 2-3 approaches" [label="yes"];
-    "Propose 2-3 approaches" -> "Present design sections";
-    "Present design sections" -> "User approves design?";
-    "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Write design doc" [label="yes"];
-    "Write design doc" -> "Spec self-review\n(fix inline)";
-    "Spec self-review\n(fix inline)" -> "User reviews spec?";
-    "User reviews spec?" -> "Write design doc" [label="changes requested"];
-    "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
+    "Propose 2-3 approaches" -> "Present approvable design overview\n(risky elements first)";
+    "Present approvable design overview\n(risky elements first)" -> "User approves overview?";
+    "User approves overview?" -> "Present approvable design overview\n(risky elements first)" [label="no, revise"];
+    "User approves overview?" -> "Build detailed design +\nwrite + self-review + commit" [label="yes"];
+    "Build detailed design +\nwrite + self-review + commit" -> "Invoke writing-plans skill";
+    "Invoke writing-plans skill" -> "Execute per chosen mode\n(inline / subagent / task-system epic)";
 }
 ```
 
-**終態即呼 writing-plans。** 勿呼 frontend-design、mcp-builder、或其他實作 skill。Brainstorming 後**唯一**呼之 skill 即 writing-plans。
+**設計許後唯一先呼之 skill 即 writing-plans**，後依步 3 之 execution mode 落實。勿呼 frontend-design、mcp-builder、或其他實作 skill。
+
+## High-Bandwidth Intake (preferred path)
+
+目標：**最少往返，最多有效資訊**。勿以一次數問、待答、再數問之擠牙膏式互動。代以一次盡呈各域之決策樹與 feedback-field，令 user 一坐而填全，subagent 於答流入時並行消化。
+
+### 1. Outline the domains first (information scent)
+
+問前，告 user 互動之**形狀**——凡幾組問、各覆何域。此乃 UX interview 之 "agenda-setting"：予 user information scent，彼乃能批次思而非逐問驚。
+
+> 「建此前，我有三組問：**(1) 前端**（layout、互動模型、狀態）、**(2) 安全需求**（authn、authz、資料敏感度）、**(3) 資料儲存格式**（schema 形狀、persistence、遷移）。我將以一可填之表盡呈，汝一次填畢即可。」
+
+### 2. Emit decision-tree + feedback screens, not micro-batches
+
+每域作一 companion `question` 或 `decision` screen（見 Visual Companion 節與 `screen-format.md`）：
+
+- **Decision tree** — 以 `radio`/`multi` input 呈分支選；branch 之選暗示下層問，於同屏以條件文揭之，免去「答 A 才知問 B」之往返。
+- **Feedback field** — 每屏附一 `text multiline` "anything else / why / constraints" field，捕汝未料之 entropy。
+- **Recommended defaults** — `decision` screen 標 `recommended: true` 於汝薦選。User 默許即省一決策；此即 UX 之 "smart defaults"。
+
+凡可一次呈者，勿拆。`AskUserQuestion`（下節）為 companion 不宜或 user 拒之 fallback。
+
+### 3. Information theory: order and prune by entropy
+
+- **High-entropy first** — 先問答案最分歧、最 downstream-determining 之問（架構、deployment、信任邊界）。此類答能 collapse 後續諸問之 space，常令半數細問自明而可刪。
+- **Prune low-information questions** — 若一問之答幾乎可由前答或既碼推定，勿問。每問當期望能變汝設計。
+- **Branch, don't enumerate** — 條件揭問勝於平鋪一長串多數不適之問。
+
+### 4. Stream answers into subagents (don't block)
+
+`events.jsonl` 之 answer/decision event 流入即動工，勿待全填畢：
+
+- 一域答畢 → 遣 subagent 草該域之設計節、或探相關既碼、或列其風險。
+- 並行多 subagent（前端 / 安全 / 資料各一），各以清 context 工，回 structured 摘。
+- User 仍填餘域時，汝已半成設計。待全答收，綴 subagent 之果為 overview。
+
+> subagent dispatch 受限：loop driver 須於 top level（subagent 不能遞迴 spawn）。
 
 ## Asking Questions with AskUserQuestion
 
-用 `AskUserQuestion` tool 於所有澄清問。Tool 支 1–4 問 per call——**常批盡可能多相關問**以減 round trip。
+`AskUserQuestion` 為 companion 不可用或 user 拒視覺時之 fallback。Tool 支 1–4 問 per call——**常批盡可能多相關問**以減 round trip。
 
 ### Batching Rules
 
@@ -91,55 +136,18 @@ it's a genuine decision point that gates everything else.
 
 ### Question Design
 
-每問應有 2–4 structured option 附述。「Other」恆自加——汝不須含之。答空或未全涵時用之。
+每問 2–4 structured option 附短述。「Other」恆自加——勿含之。`multiSelect: true` 於可多選者；`preview` 於 layout/視覺擇（ASCII mock）。開放無界之問（"what do you want to build?"）作純文，勿作 `AskUserQuestion`。
 
 ```
-Good question design:
   question: "What's the primary deployment target?"
   options:
-    - label: "Container / Kubernetes"      description: "Docker image, orchestrated"
-    - label: "Serverless"                  description: "Lambda, Cloud Functions"
-    - label: "Desktop app"                 description: "Packaged binary, local only"
-    - label: "Edge runtime"                description: "Cloudflare Workers, Deno Deploy"
-
-Good use of multiSelect:
-  question: "Which external services does this integrate with?"
-  multiSelect: true
-  options:
-    - label: "Auth provider"     description: "OAuth, Auth0, Clerk"
-    - label: "Payment gateway"   description: "Stripe, Paddle"
-    - label: "Email service"     description: "SendGrid, Postmark, SES"
-    - label: "Storage"           description: "S3, GCS, Cloudflare R2"
-
-Good use of preview (for visual/layout choices):
-  question: "Which dashboard layout fits your workflow?"
-  options:
-    - label: "Sidebar nav"   preview: "┌──┬────────┐\n│  │        │\n│  │        │\n└──┴────────┘"
-    - label: "Top nav"       preview: "┌────────────┐\n├────────────┤\n│            │\n└────────────┘"
-
-Bad — open-ended with no options (use free text via Other instead):
-  question: "What do you want to build?"   ← ask this as text, not AskUserQuestion
+    - {label: "Container / K8s",  description: "Docker image, orchestrated"}
+    - {label: "Serverless",       description: "Lambda, Cloud Functions"}
+    - {label: "Desktop app",      description: "Packaged binary, local only"}
+    - {label: "Edge runtime",     description: "Cloudflare Workers, Deno Deploy"}
 ```
 
-### First Question Batch — Standard Opening
-
-多數 project，以此 3–4 問於一 call 開：
-
-```
-1. Project/feature scope
-   (What is this, at a high level — new feature, bug fix, standalone tool?)
-
-2. Architecture / style preference
-   (Simple/flat, CRUD, DDD, event-driven, microservices?)
-
-3. Primary constraint
-   (Speed of delivery, maintainability, performance, team size?)
-
-4. Existing codebase?
-   (Greenfield, adding to existing project, replacing something?)
-```
-
-讀答後，再批 2–4 問於細。通 2 輪批問即足；3 乃極限於呈法前。
+若用 fallback 開場，首 call 批：scope、architecture/style、primary constraint、existing-codebase——加步 3 之 execution mode。讀答後再批 2–4 於細；通 2 輪即足，3 為極限。
 
 ### When to Use Free Text
 
@@ -151,28 +159,25 @@ Bad — open-ended with no options (use free text via Other instead):
 
 ## The Process
 
-**明念：**
+問之機制見 High-Bandwidth Intake 與 AskUserQuestion 節。此節僅補彼未涵者：scope-splitting、設計清晰、既 codebase。
 
-- 先察當 project 狀（檔、docs、近 commit）
+**Scope-split 先於問細：**
+
 - 問前察 scope：若請述多獨立子系統（例如「建 chat + file storage + billing + analytics 之平台」），立旗。勿耗問於應先分解之 project 之細。
 - 若 project 過大，助 user 分子 project：何乃獨片，如何相關，當以何序建？ 後以常設計流 brainstorm 第一子 project。每子 project 有其 spec → plan → impl 環。
-- 用 `AskUserQuestion` 於所有 structured 擇。批 2–4 per call。
-- 用純文問於無界或 context 者。
-- 專注於明：目的、限制、成準
+- 問之專注於明：目的、限制、成準。
 
-**探法：**
+**探法：** 呈 2-3 法附權衡，領以汝薦者並釋何以。
 
-- 呈 2-3 法附權衡
-- 對話式呈選，附汝薦與因
-- 領以汝薦者並釋何以
+**呈設計——綱要先，細節後：**
 
-**呈設計：**
+勿先呈摘要、再令 user 審冗長細設計。代以兩段：
 
-- 明所建後，呈設計
-- 每節按複雜度縮放：簡者數句，細者 200-300 字
-- 每節後問觀之宜否
-- 涵：架構、組件、資料流、錯處、測
-- 備若不合則回澄
+1. **可批准之設計綱要（approvable overview）** — 簡而完整足以批准之綱。**先列風險元**：irreversible 之選、信任邊界、load-bearing 之假設、難回頭之 trade-off。User 於此一處許之。綱要非摘要——乃汝願據以起工之最小決策集。
+2. **細設計** — 綱要許後方展。涵架構、組件、資料流、錯處、測。此段不再設獨立批准門——綱要已含風險決策；細節乃其落實。寫畢 inline self-review 即進。
+
+- 備若綱要不合則回澄或改綱，再取許。
+- 每節按複雜度縮放：簡者數句，細者 200-300 字。
 
 **設計為孤立與清晰：**
 
@@ -206,35 +211,37 @@ Bad — open-ended with no options (use free text via Other instead):
 
 Inline 修疾。無需再審——修即進。
 
-**User Review Gate：**
-Spec review 環過後，請 user 審書成之 spec 再進：
+**無第二批准門。** 風險決策已於 overview 取許；細 spec 乃其落實。寫畢、self-review、commit 即逕呼 writing-plans 起工。唯細設計浮出 overview 未涵之新風險決策時，方回 user 取一次許；餘則勿再設冗門阻工。
 
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+**Implementation — 依步 3 所選之 execution mode 分歧：**
 
-待 user 答。若請變，作之並再跑 spec review 環。僅於 user 許後進。
+皆先呼 writing-plans skill 造詳 impl 計劃，後依 mode 落實：
 
-**Implementation：**
+- **① build inline** — writing-plans 後，即於此 session 自執計劃。
+- **② subagent** — writing-plans 後，遣 subagent 執之（loop driver 須於 top level）；汝綴其果。
+- **③ epic-task-subtask plan** — 化計劃為 user 偏好 task system（如 Dart）之 epic → task → subtask 階層。各 subtask 為一可獨執之單位，繫於 task，task 繫於 epic。建畢交 user 之執行 loop（如 dartai/workflow loop）。
 
-- 呼 writing-plans skill 以造詳 impl 計劃
-- 勿呼他 skill。writing-plans 即下一步。
+writing-plans 為 brainstorming 後**唯一**先呼之 skill；勿呼 frontend-design、mcp-builder 等實作 skill。三 mode 之別僅在計劃**如何落實**，非是否規劃。
 
 ## Key Principles
 
-- **Batch questions** - 用 `AskUserQuestion` 含 2–4 問 per call；減 round trip
-- **Structured options preferred** - 界明時易答
+- **Outline domains first** - 揭問之全景予 user，建 information scent，後入細
+- **High-bandwidth intake** - companion decision-tree + feedback-field 一次盡呈，壓往返；micro-batch 為 fallback
+- **Maximize information per turn** - high-entropy 問先，剪可推定之問，branch 勝 enumerate
+- **Stream into subagents** - 答流入即並行消化，勿待全答畢
+- **Overview gate, not double gate** - 風險先之可批准綱要取一許；細設計不再設獨立門
 - **YAGNI ruthlessly** - 自所有設計除無謂功
 - **Explore alternatives** - 定前常提 2-3 法
-- **Incremental validation** - 分節呈設計，取許方進
 - **Be flexible** - 不合時回澄
 
 ## Visual Companion (mini-IDE)
 
-一 browser-based companion，render Claude 書於 session 目錄之 markdown+YAML screen。替舊 fragment-based companion（已自此 fork 除）。作 tool——非 mode。受 companion 意其可為宜視覺處之問所用；不意每問必經瀏覽器。
+一 browser-based companion，render Claude 書於 session 目錄之 markdown+YAML screen。替舊 fragment-based companion（已自此 fork 除）。此乃 High-Bandwidth Intake 之**主通道**：decision-tree 與 feedback screen 經此呈，壓往返。亦載視覺（mockup、layout、diagram、demo）。
 
-**提 companion：** 當汝料下問涉視覺（mockup、layout、diagram）時，提一次以取同意：
-> "Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. Want to try it? (Requires opening a local URL)"
+**提 companion：** 揭問域後，提一次以取同意——既為視覺，亦為一次盡填之 intake 表：
+> "I'd like to put these questions in a small web form so you can answer them all at once instead of back-and-forth — it can also show mockups, diagrams, and comparisons as we go. Want to try it? (Requires opening a local URL)"
 
-**此提必為獨訊。** 勿合以澄清問、context 摘、或他內容。
+**此提必為獨訊。** 勿合以澄清問、context 摘、或他內容。若 user 拒，落回 `AskUserQuestion` micro-batch。
 
 ### Starting the companion
 

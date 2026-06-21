@@ -1,4 +1,4 @@
-export interface ScreenSummary { id: string; kind: "question"|"demo"|"decision"; title: string; pinned: boolean; }
+export interface ScreenSummary { id: string; kind: "question"|"demo"|"decision"; title: string; pinned: boolean; answered?: boolean; }
 export interface DecisionSummary {
   id: string;
   title: string;
@@ -14,6 +14,11 @@ export async function listScreens(): Promise<ScreenSummary[]> {
 }
 export async function getScreen(id: string) {
   return (await fetch(`/api/screens/${encodeURIComponent(id)}`)).json();
+}
+export async function getAnswer(id: string): Promise<Record<string, unknown> | null> {
+  const res = await fetch(`/api/answers/${encodeURIComponent(id)}`);
+  if (!res.ok) return null;
+  return (await res.json()).inputs ?? null;
 }
 export async function listDecisions(): Promise<DecisionSummary[]> {
   return (await fetch("/api/decisions")).json();

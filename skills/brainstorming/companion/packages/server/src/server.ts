@@ -4,6 +4,7 @@ import { createWsHub } from "./ws";
 import { createEventsWriter } from "./events-writer";
 import { createIdempotencyStore } from "./idempotency";
 import { createDecisionsRepo } from "./decisions-repo";
+import { createAnswersRepo } from "./answers-repo";
 import { handle, flushAllDemo, type RouteCtx } from "./routes";
 import type { Server } from "bun";
 
@@ -36,7 +37,8 @@ export async function runStart(opts: CliOptions): Promise<RunningServer> {
   const events = createEventsWriter(opts.sessionDir, { rotateBytes: 10_000_000 });
   const idempotency = createIdempotencyStore();
   const decisions = createDecisionsRepo(opts.sessionDir);
-  const ctx: RouteCtx = { screens, broadcast, events, idempotency, decisions, docRoots: opts.docRoots };
+  const answers = createAnswersRepo(opts.sessionDir);
+  const ctx: RouteCtx = { screens, broadcast, events, idempotency, decisions, answers, docRoots: opts.docRoots };
   screens.onChange((kind, id) => {
     broadcast.push("refresh", { kind: "screen", id, action: kind });
   });

@@ -2,6 +2,7 @@ import type { ScreensRepo } from "./screens-repo";
 import type { EventsWriter } from "./events-writer";
 import type { IdempotencyStore } from "./idempotency";
 import type { DecisionsRepo } from "./decisions-repo";
+import type { AnswersRepo } from "./answers-repo";
 import { assertDeclaredPath, savePrivate } from "./privacy";
 import { existsSync, readdirSync, statSync, readFileSync } from "fs";
 import { join, relative, resolve, dirname } from "path";
@@ -81,6 +82,7 @@ export interface RouteCtx {
   events: EventsWriter;
   idempotency: IdempotencyStore;
   decisions: DecisionsRepo;
+  answers: AnswersRepo;
   docRoots: string[];
   shutdown?: (reason: string) => Promise<void>;
 }
@@ -115,6 +117,7 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
       kind: s.frontmatter.kind,
       title: s.frontmatter.title,
       pinned: s.frontmatter.pinned,
+      answered: ctx.answers.get(s.frontmatter.id) !== undefined,
     })));
   }
   if (req.method === "GET" && url.pathname.startsWith("/api/screens/")) {
@@ -122,6 +125,15 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
     const s = ctx.screens.get(id);
     if (!s) return new Response("not found", { status: 404 });
     return Response.json({ frontmatter: s.frontmatter, body: s.body });
+  }
+  if (req.method === "GET" && url.pathname === "/api/answers") {
+    return Response.json(ctx.answers.all());
+  }
+  if (req.method === "GET" && url.pathname.startsWith("/api/answers/")) {
+    const id = url.pathname.slice("/api/answers/".length);
+    const inputs = ctx.answers.get(id);
+    if (!inputs) return new Response("not found", { status: 404 });
+    return Response.json({ screen_id: id, inputs });
   }
   if (req.method === "POST" && url.pathname === "/api/answer") {
     const body = await req.json().catch(() => null) as {
@@ -147,6 +159,8 @@ export async function handle(req: Request, ctx: RouteCtx): Promise<Response> {
       if (name && name in body.inputs) publicInputs[name] = body.inputs[name];
     }
     await ctx.events.append({ type: "answer", screen_id: body.screen_id, inputs: publicInputs });
+    ctx.answers.set(body.screen_id, publicInputs);
+    ctx.broadcast.push("refresh", { kind: "screen", id: body.screen_id, action: "answered" });
     return Response.json({ ok: true });
   }
   if (req.method === "POST" && url.pathname === "/api/private-save") {

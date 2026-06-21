@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { getScreen, submitAnswer } from "../lib/api";
+import { getScreen, getAnswer, submitAnswer } from "../lib/api";
 import { renderMarkdown } from "../lib/markdown";
 import { renderAllMermaidBlocks } from "../lib/mermaid";
 import { RadioInput } from "../inputs/RadioInput";
@@ -15,17 +15,28 @@ export function ScreenView({ params }: { params: { id: string } }) {
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let active = true;
     setScreen(null);
     setValues({});
     setSubmitted(false);
-    void getScreen(params.id).then(setScreen);
+    void Promise.all([getScreen(params.id), getAnswer(params.id)]).then(([s, prior]) => {
+      if (!active) return;
+      setScreen(s);
+      // Rehydrate prior selections so navigating back to an answered screen
+      // shows what was submitted instead of a blank form.
+      if (prior) { setValues(prior); setSubmitted(true); }
+    });
+    return () => { active = false; };
   }, [params.id]);
   useEffect(() => { if (bodyRef.current) void renderAllMermaidBlocks(bodyRef.current); }, [screen?.frontmatter?.id]);
   if (!screen) return <p>Loading…</p>;
   const { frontmatter: fm, body } = screen;
   if (fm.kind !== "question") return <p>Wrong kind for this view.</p>;
 
-  function setValue(name: string, v: unknown) { setValues(prev => ({ ...prev, [name]: v })); }
+  function setValue(name: string, v: unknown) {
+    setValues(prev => ({ ...prev, [name]: v }));
+    setSubmitted(false); // editing a rehydrated answer re-enables Submit
+  }
 
   async function onSubmit(e: Event) {
     e.preventDefault();

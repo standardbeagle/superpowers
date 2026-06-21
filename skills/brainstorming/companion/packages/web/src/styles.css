@@ -24,6 +24,7 @@ fieldset legend { font-weight: 600; padding: 0 6px; }
 .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; color: var(--fg); text-decoration: none; font-size: 13px; }
 .sidebar-item:hover { background: rgba(255,255,255,0.05); }
 .sidebar-item .dot { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; }
+.sidebar-item .dot.dot-answered { background: #22c55e; }
 .badge { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
 .badge-proposed { background: #eab308; }
 .badge-approved { background: #22c55e; }

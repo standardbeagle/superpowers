@@ -27,7 +27,7 @@ export function Sidebar() {
             class="sidebar-item"
             data-kind={s.kind}
           >
-            <span class="dot" /> {s.title}
+            <span class={`dot${s.answered ? " dot-answered" : ""}`} /> {s.title}
           </a>
         ))}
       </Section>
